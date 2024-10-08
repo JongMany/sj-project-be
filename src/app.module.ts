@@ -7,15 +7,19 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import Joi from 'joi';
+// import Joi from 'joi';
 import { join } from 'path';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middleware';
-import { UserEntity } from 'src/user/entities/user.entity';
+import appConfig from 'src/config/app.config';
+import dbConfig from 'src/config/db.config';
 
+// console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: `.env`,
+      load: [appConfig, dbConfig], // * 여러개의 config를 로드할 수 있다.
       // validationSchema: Joi.object({
       //   // API
       //   PORT: Joi.number().required(),

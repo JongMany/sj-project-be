@@ -23,13 +23,7 @@ export class UserEntity {
   @Column()
   name: string;
   @Column()
-  gender: string;
-  @Column()
-  birth: Date;
-
-  getId(): string {
-    return this.id;
-  }
+  phone: string;
 
   getPassword(): string {
     return this.password;

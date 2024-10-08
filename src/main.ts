@@ -7,12 +7,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { HttpExceptionFilter } from 'src/common/exception/http-exception.filter';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+  const secretKey = configService.get<string>('app.jwt.secretKey');
 
   app.enableCors({
     origin: true,
@@ -22,7 +23,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.use(cookieParser(configService.getOrThrow('SECRET')));
+  app.use(cookieParser(configService.getOrThrow<string>('app.jwt.secretKey')));
 
   /* const swaggerConfig = new DocumentBuilder()
     .setTitle('saju')
@@ -53,7 +54,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
-  const port = configService.get('PORT') || 3000;
+  const port = configService.get('app.common.port') || 8080;
   await app.listen(port);
   Logger.log(`Server running on http://localhost:${port}`, 'Bootstrap');
 }
