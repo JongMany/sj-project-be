@@ -10,8 +10,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 // import Joi from 'joi';
 import { join } from 'path';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middleware';
+import { GptModule } from './gpt/gpt.module';
 import appConfig from 'src/config/app.config';
 import dbConfig from 'src/config/db.config';
+import gptConfig from 'src/config/gpt.config';
 
 // console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 @Module({
@@ -19,7 +21,7 @@ import dbConfig from 'src/config/db.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env`,
-      load: [appConfig, dbConfig], // * 여러개의 config를 로드할 수 있다.
+      load: [appConfig, dbConfig, gptConfig], // * 여러개의 config를 로드할 수 있다.
       // validationSchema: Joi.object({
       //   // API
       //   PORT: Joi.number().required(),
@@ -66,6 +68,7 @@ import dbConfig from 'src/config/db.config';
     AuthModule,
     RedisModule,
     UserModule,
+    GptModule,
   ],
   controllers: [AppController],
   providers: [AppService],
