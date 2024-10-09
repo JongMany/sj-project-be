@@ -9,6 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { LoginRequestDto } from 'src/auth/dto/login-request.dto';
 
 import { RedisService } from 'src/redis/redis.service';
+import { RegisterUserRequestDto } from 'src/user/dto/register-user.request.dto';
 import { UserService } from 'src/user/user.service';
 
 // const CACHE_SERVICE = 'CacheService';
@@ -23,6 +24,11 @@ export class AuthService {
     // @Inject(CACHE_SERVICE)
     private readonly cacheService: RedisService,
   ) {}
+
+  async register(registerDto: RegisterUserRequestDto) {
+    console.log('registerDto', registerDto);
+    // return await this.userService.register(registerDto);
+  }
 
   async validateUser(email: string, plainTextPassword: string) {
     const user = await this.userService.findByEmail(email);
