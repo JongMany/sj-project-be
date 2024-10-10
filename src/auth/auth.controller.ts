@@ -21,10 +21,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   async register(
     @Body() registerDto: RegisterUserRequestDto,
   ): Promise<UserEntity> {
-    // ): Promise<void> {
     return this.authService.register(registerDto);
   }
 
@@ -32,6 +32,7 @@ export class AuthController {
   @Post('/login')
   @UsePipes(new ValidationPipe())
   async login(@Body() user: LoginRequestDto): Promise<TokenResponseDto> {
+    console.log('user', user);
     return this.authService.login(user);
   }
 

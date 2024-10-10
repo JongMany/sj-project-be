@@ -27,7 +27,6 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterUserRequestDto) {
-    console.log('registerDto', registerDto);
     return await this.userService.register(registerDto);
   }
 
@@ -52,16 +51,21 @@ export class AuthService {
   }
 
   async login(user: LoginRequestDto) {
-    const id = user.id;
+    const email = user.email;
 
-    const accessToken = await this.generateAccessToken(id);
-    const refreshToken = await this.generateRefreshToken(id);
+    const accessToken = await this.generateAccessToken(email);
+    const refreshToken = await this.generateRefreshToken(email);
 
-    await this.setRefreshToken(id, refreshToken);
+    await this.setRefreshToken(email, refreshToken);
 
     return { accessToken, refreshToken };
   }
 
+  /**
+   * @summary Access Token 생성 함수
+   * @param {string} userId
+   * @returns {string}
+   */
   private async generateAccessToken(userId: string) {
     const token = this.jwtService.sign(
       { userId },
@@ -74,12 +78,17 @@ export class AuthService {
     return token;
   }
 
+  /**
+   * @summary RefreshToken Token 생성 함수
+   * @param {string} userId
+   * @returns {string}
+   */
   private async generateRefreshToken(userId: string) {
     const token = this.jwtService.sign(
       { userId },
       {
         secret: this.configService.get('app.jwt.accessSecret'),
-        expiresIn: Number(this.configService.get('app.jwt.refreshExpireTime')),
+        expiresIn: this.configService.get('app.jwt.refreshExpireTime'),
       },
     );
 
@@ -88,6 +97,8 @@ export class AuthService {
 
   // Refresh Token을 Redis 서버에 userId를 key로 저장
   async setRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    console.log('setRefreshToken', userId);
+
     const ttl = this.configService.get<string>('app.jwt.ttl'); // TTL 값 설정
     await this.cacheService.insert(
       `refreshToken:${userId}`,

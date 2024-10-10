@@ -24,7 +24,6 @@ export class RedisModule implements OnApplicationShutdown {
   constructor(private readonly moduleRef: ModuleRef) {}
 
   async onApplicationShutdown(signal?: string) {
-    console.log('Shutting down Redis connection', signal);
     return new Promise<void>((resolve) => {
       const redis = this.moduleRef.get(IORedisKey);
       redis.quit();

@@ -2,12 +2,13 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { RedisModule } from './redis/redis.module';
+import { RedisModule as RedisCacheModule } from './redis/redis.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 // import Joi from 'joi';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { join } from 'path';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middleware';
 import { GptModule } from './gpt/gpt.module';
@@ -64,8 +65,21 @@ import gptConfig from 'src/config/gpt.config';
         };
       },
     }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          config: {
+            host: configService.get('db.redis.host'),
+            port: configService.get('db.redis.port'),
+            password: configService.get('db.redis.password'),
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
     AuthModule,
-    RedisModule,
+    RedisCacheModule,
     UserModule,
     GptModule,
   ],
