@@ -15,7 +15,6 @@ import appConfig from 'src/config/app.config';
 import dbConfig from 'src/config/db.config';
 import gptConfig from 'src/config/gpt.config';
 
-// console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -50,20 +49,20 @@ import gptConfig from 'src/config/gpt.config';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: parseInt(configService.get('DB_PORT'), 10),
-        username: configService.get('DB_USER'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        // entities: ['dist/**/*.entity{.ts,.js}'],
-        entities: [join(__dirname, '**', '*.entity.{ts,js}')],
-        // entities: [UserEntity],
-        synchronize: true,
-        namingStrategy: new SnakeNamingStrategy(),
-        // dropSchema: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        return {
+          type: 'postgres',
+          host: configService.get<string>('db.postgres.host'),
+          port: parseInt(configService.get<string>('db.postgres.port'), 10),
+          username: configService.get<string>('db.postgres.username'),
+          password: configService.get<string>('db.postgres.password'),
+          database: configService.get<string>('db.postgres.name'),
+          // entities: ['dist/**/*.entity{.ts,.js}'],
+          entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+          synchronize: true,
+          namingStrategy: new SnakeNamingStrategy(),
+        };
+      },
     }),
     AuthModule,
     RedisModule,
@@ -74,6 +73,8 @@ import gptConfig from 'src/config/gpt.config';
   providers: [AppService],
 })
 export class AppModule implements NestModule {
+  constructor() {}
+
   configure(consumer: MiddlewareConsumer): void {
     // console.log(join(__dirname, '**'));
     consumer.apply(LoggerMiddleware).forRoutes('*');

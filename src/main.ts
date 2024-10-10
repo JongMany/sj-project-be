@@ -55,6 +55,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
   const port = configService.get('app.common.port') || 8080;
+
   await app.listen(port);
   Logger.log(`Server running on http://localhost:${port}`, 'Bootstrap');
 }

@@ -8,6 +8,7 @@ export default registerAs('app', () => ({
     refreshSecret: process.env.JWT_REFRESH_SECRET,
     accessExpireTime: process.env.JWT_ACCESS_EXPIRE_TIME,
     refreshExpireTime: process.env.JWT_REFRESH_EXPIRE_TIME,
+    ttl: process.env.RT_JWT_EXPIRATION_TIME,
   },
   common: {
     port: process.env.PORT || 8080,

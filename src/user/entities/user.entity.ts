@@ -23,7 +23,9 @@ export class UserEntity {
   @Column()
   name: string;
   @Column()
-  phone: string;
+  phoneNumber: string;
+  @Column()
+  group: 'A' | 'B' | 'C' | 'D';
 
   getPassword(): string {
     return this.password;
@@ -31,10 +33,6 @@ export class UserEntity {
 
   getEmail(): string {
     return this.email;
-  }
-
-  setPassword(password: string): void {
-    this.password = password;
   }
 
   #salt: string | undefined;

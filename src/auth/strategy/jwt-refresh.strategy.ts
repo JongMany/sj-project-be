@@ -14,7 +14,6 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     private configService: ConfigService,
     private authService: AuthService,
   ) {
-    console.log('JwtAccessTokenStrategy', ExtractJwt);
     super({
       jwtFromRequest: ExtractJwt?.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get<string>('app.jwt.refreshSecret'),

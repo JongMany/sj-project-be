@@ -14,6 +14,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt-access.guard';
 import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh.guard';
 import { RegisterUserRequestDto } from 'src/user/dto/register-user.request.dto';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +23,8 @@ export class AuthController {
   @Post('register')
   async register(
     @Body() registerDto: RegisterUserRequestDto,
-    // ): Promise<UserEntity> {
-  ): Promise<void> {
+  ): Promise<UserEntity> {
+    // ): Promise<void> {
     return this.authService.register(registerDto);
   }
 
