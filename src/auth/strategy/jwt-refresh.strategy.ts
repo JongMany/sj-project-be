@@ -8,7 +8,7 @@ import { Payload } from 'src/auth/strategy/token-payload.type';
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
   Strategy,
-  'jwt-refresh',
+  'jwt-refresh-token',
 ) {
   constructor(
     private configService: ConfigService,
@@ -16,23 +16,38 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   ) {
     super({
       jwtFromRequest: ExtractJwt?.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: ExtractJwt.fromExtractors([
+      //   (req: Request) => {
+      //     console.log(req.headers['authorization']);
+      //     return req.headers['authorization'];
+      //   },
+      // ]),
       secretOrKey: configService.get<string>('app.jwt.refreshSecret'),
       passReqToCallback: true,
-      ignoreExpiration: false,
+      // ignoreExpiration: false,
     });
   }
 
   async validate(req: Request, payload: Payload) {
-    const refreshToken = req.headers['authorization'].split(' ')[1]; // client request의 헤더에서 토큰값 가져오기('Bearer ' 제거)
-
-    const isTokenValid = await this.authService.isRefreshTokenValid(
-      refreshToken,
-      payload.userId,
-    );
-    if (!isTokenValid) {
-      throw new UnauthorizedException('유효한 토큰이 아닙니다.');
+    try {
+      console.log(
+        'Authorization Header:',
+        req.headers['authorization'],
+        payload,
+      ); // 헤더 확인
+      const refreshToken = req.headers['authorization'].split(' ')[1]; // Bearer token
+      const isTokenValid = await this.authService.isRefreshTokenValid(
+        refreshToken,
+        payload.userId,
+      );
+      console.log('isTokenValid', isTokenValid);
+      if (!isTokenValid) {
+        throw new UnauthorizedException('유효한 토큰이 아닙니다.');
+      }
+      return isTokenValid;
+    } catch (error) {
+      console.error('JwtRefreshTokenStrategy validate Error:', error);
+      throw error;
     }
-
-    return payload.userId;
   }
 }

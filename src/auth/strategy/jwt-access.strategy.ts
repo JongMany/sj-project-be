@@ -5,7 +5,10 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Payload } from 'src/auth/strategy/token-payload.type';
 
 @Injectable()
-export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessTokenStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-access',
+) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -15,9 +18,9 @@ export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: Payload) {
-    // return payload.userId;
+    console.log('accessToken', payload);
     try {
-      return payload;
+      return payload.userId;
     } catch (error) {
       throw error;
     }

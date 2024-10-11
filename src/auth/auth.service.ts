@@ -13,16 +13,13 @@ import { RegisterUserRequestDto } from 'src/user/dto/register-user.request.dto';
 import { UserService } from 'src/user/user.service';
 
 //https://junior-datalist.tistory.com/352
-// const CACHE_SERVICE = 'CacheService';
 
 @Injectable()
 export class AuthService {
   constructor(
-    // @InjectRepository(UserEntity)
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    // @Inject(CACHE_SERVICE)
     private readonly cacheService: RedisService,
   ) {}
 
@@ -63,14 +60,14 @@ export class AuthService {
 
   /**
    * @summary Access Token 생성 함수
-   * @param {string} userId
+   * @param {string} userId - 이메일
    * @returns {string}
    */
   private async generateAccessToken(userId: string) {
     const token = this.jwtService.sign(
       { userId },
       {
-        secret: this.configService.get('app.jwt.refreshSecret'),
+        secret: this.configService.get('app.jwt.accessSecret'),
         expiresIn: this.configService.get('app.jwt.accessExpireTime'),
       },
     );
@@ -87,7 +84,7 @@ export class AuthService {
     const token = this.jwtService.sign(
       { userId },
       {
-        secret: this.configService.get('app.jwt.accessSecret'),
+        secret: this.configService.get('app.jwt.refreshSecret'),
         expiresIn: this.configService.get('app.jwt.refreshExpireTime'),
       },
     );
@@ -97,9 +94,7 @@ export class AuthService {
 
   // Refresh Token을 Redis 서버에 userId를 key로 저장
   async setRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    console.log('setRefreshToken', userId);
-
-    const ttl = this.configService.get<string>('app.jwt.ttl'); // TTL 값 설정
+    const ttl = this.configService.get<string>('app.jwt.ttl') || '604800'; // TTL 값 설정
     await this.cacheService.insert(
       `refreshToken:${userId}`,
       refreshToken,

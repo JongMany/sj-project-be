@@ -9,7 +9,14 @@ import { JwtRefreshTokenStrategy } from 'src/auth/strategy/jwt-refresh.strategy'
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [UserModule, PassportModule, JwtModule.register({})],
+  imports: [
+    UserModule,
+    PassportModule.register({
+      defaultStrategy: 'jwt-refresh-token',
+      session: false,
+    }),
+    JwtModule.register({}),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,

@@ -1,4 +1,8 @@
 export interface TokenResponseDto {
-  accessToken: string;
-  refreshToken: string;
+  success: boolean;
+  token: {
+    accessToken: string;
+    refreshToken: string;
+  };
+  email: string;
 }

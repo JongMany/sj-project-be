@@ -1,9 +1,11 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { UserEntity } from 'src/user/entities/user.entity';
 
-// LocalAuthGuard에서 로그인 성공 시 req.user에 저장한 유저 정보를 가져오는 데코레이터
+// 요청안에 있는 user 값을 가지고 온다.
 export const CurrentUser = createParamDecorator(
-  (data, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
+  (data, ctx: ExecutionContext): string => {
+    const req = ctx.switchToHttp().getRequest();
+    console.log('CurrentUser req.user:', req.user, req.userId);
+    return req.user;
   },
 );
