@@ -29,7 +29,8 @@ export class AuthService {
 
   async validateUser(email: string, plainTextPassword: string) {
     const user = await this.userService.findByEmail(email);
-    const isPasswordValid = user.checkPassword(plainTextPassword);
+    const isPasswordValid = await user.checkPassword(plainTextPassword);
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('비밀번호를 확인해주세요.');
     }

@@ -16,6 +16,7 @@ import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 import { RegisterUserRequestDto } from 'src/user/dto/register-user.request.dto';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh.guard';
+import { LocalAuthGuard } from 'src/auth/guard/local.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -34,9 +35,9 @@ export class AuthController {
     };
   }
 
-  // @UseGuards(LocalAuthGuard)
   @Post('/login')
   @UsePipes(new ValidationPipe())
+  @UseGuards(LocalAuthGuard)
   async login(@Body() user: LoginRequestDto): Promise<TokenResponseDto> {
     const token = await this.authService.login(user);
     return { token, success: true, email: user.email };
