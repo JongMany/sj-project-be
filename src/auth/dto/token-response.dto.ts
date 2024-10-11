@@ -5,4 +5,6 @@ export interface TokenResponseDto {
     refreshToken: string;
   };
   email: string;
+  group: 'A' | 'B' | 'C' | 'D';
+  name: string;
 }

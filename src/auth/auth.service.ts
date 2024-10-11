@@ -48,15 +48,16 @@ export class AuthService {
     }
   }
 
-  async login(user: LoginRequestDto) {
-    const email = user.email;
+  async login(loginRequestDto: LoginRequestDto) {
+    const email = loginRequestDto.email;
 
     const accessToken = await this.generateAccessToken(email);
     const refreshToken = await this.generateRefreshToken(email);
 
     await this.setRefreshToken(email, refreshToken);
+    const user = await this.userService.findByEmail(email);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, group: user.group, name: user.name };
   }
 
   /**

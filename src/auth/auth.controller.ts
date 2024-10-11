@@ -39,8 +39,15 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   @UseGuards(LocalAuthGuard)
   async login(@Body() user: LoginRequestDto): Promise<TokenResponseDto> {
-    const token = await this.authService.login(user);
-    return { token, success: true, email: user.email };
+    const { accessToken, refreshToken, group, name } =
+      await this.authService.login(user);
+    return {
+      token: { accessToken, refreshToken },
+      success: true,
+      email: user.email,
+      group,
+      name,
+    };
   }
 
   @UseGuards(JwtRefreshAuthGuard)
