@@ -16,6 +16,7 @@ import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 
 // https://www.youtube.com/watch?v=rlbKpEGWiT0
 //https://dev.to/esponges/build-the-new-openai-assistant-with-function-calling-52f5
+// // https://pkgpl.org/2023/11/08/openai-assistants-api%EB%A1%9C-%EB%8C%80%ED%99%94-%EB%82%B4%EC%9A%A9-%EC%A0%80%EC%9E%A5%ED%95%98%EA%B8%B0/
 @Controller('gpt')
 export class GptController {
   constructor(private readonly gptService: GptService) {}
@@ -34,10 +35,13 @@ export class GptController {
   }
 
   @Get('/messages/:threadId')
+  @UseGuards(JwtAuthGuard)
   async getMessages(@Param('threadId') threadId: string, @Response() res) {
     const messages = await this.gptService.getMessages(threadId);
+    console.log(messages.data);
     return res.json({
-      messages,
+      messages: messages.data.reverse(),
+      success: true,
     });
   }
 
