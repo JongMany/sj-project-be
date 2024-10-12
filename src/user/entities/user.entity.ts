@@ -5,9 +5,11 @@ import {
   Column,
   DeepPartial,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 // import * as bcrypt from 'bcrypt';
 
 const bcryptRegex = /^\$(?:2a|2x|2y|2b)\$\d+\$/u;
@@ -24,8 +26,10 @@ export class UserEntity {
   name: string;
   @Column()
   phoneNumber: string;
-  @Column()
+  @Column({ type: 'enum', enum: ['A', 'B', 'C', 'D'], default: 'A' })
   group: 'A' | 'B' | 'C' | 'D';
+  @OneToMany(() => ThreadEntity, (thread) => thread.user)
+  threads: ThreadEntity[];
 
   getPassword(): string {
     return this.password;
