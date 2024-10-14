@@ -57,11 +57,12 @@ export class GptController {
   }
   @Post('/message')
   async sendMessage(@Body() body, @Response() res) {
-    const { message: userMessage, threadId } = body;
-    console.log(userMessage, threadId);
+    const { message: userMessage, threadId, type } = body;
+    console.log('sendMessage1', userMessage, threadId, type);
     const message = await this.gptService.addMessage(threadId, userMessage);
+    console.log('sendMessage2', message);
     // run assistant
-    const run = await this.gptService.runAssistant(threadId);
+    const run = await this.gptService.runAssistant(threadId, type);
     const runId = run.id;
 
     this.gptService.pollingIntervalId = setInterval(async () => {

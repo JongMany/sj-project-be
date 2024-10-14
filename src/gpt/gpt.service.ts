@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import OpenAI from 'openai';
-import { CreateThreadDto } from './dto/create-thread.dto';
+import { AssistantType, CreateThreadDto } from './dto/create-thread.dto';
 import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,12 @@ import { UserEntity } from 'src/user/entities/user.entity';
 //https://stephenwalther.com/build-an-openai-assistant-app-with-nodejs-in-less-than-15-minutes/
 // const ASSISTANT_NAME = 'FUNNYMAN';
 
-const ASSISTANT_ID = 'asst_1ExgDmwmIqos4AT2O1nEKfBS';
+const ASSISTANT_ID_MAP = {
+  Funny: 'asst_1ExgDmwmIqos4AT2O1nEKfBS',
+  Feedback: null,
+  Kind: null,
+  Default: null,
+};
 
 @Injectable()
 export class GptService {
@@ -73,10 +78,10 @@ export class GptService {
     return messages;
   }
 
-  async runAssistant(threadId: string) {
+  async runAssistant(threadId: string, type: AssistantType) {
     console.log('Running assistant for thread' + threadId);
     const response = await this.openAiApi.beta.threads.runs.create(threadId, {
-      assistant_id: ASSISTANT_ID,
+      assistant_id: ASSISTANT_ID_MAP[type],
     });
     console.log('Assistant response', response);
     return response;
