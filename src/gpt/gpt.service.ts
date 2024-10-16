@@ -129,4 +129,14 @@ export class GptService {
       type: thread.type,
     }));
   }
+
+  async findThreadIdByType(assistantType: AssistantType, email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['threads'],
+    });
+
+    const thread = user.threads.find((thread) => thread.type === assistantType);
+    return thread?.threadId || '';
+  }
 }

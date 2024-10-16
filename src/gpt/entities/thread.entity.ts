@@ -5,9 +5,11 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity('threads')
+@Unique(['user', 'type']) //user와 type을 기반으로 유니크 제약조건 생성
 export class ThreadEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

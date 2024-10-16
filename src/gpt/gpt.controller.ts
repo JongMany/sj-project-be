@@ -28,10 +28,26 @@ export class GptController {
     @Body() createThreadDto: CreateThreadDto,
     @Response() res,
   ) {
-    const thread = await this.gptService.createThread(createThreadDto);
-    return res.json({
-      threadId: thread.id,
-    });
+    try {
+      const threadId = await this.gptService.findThreadIdByType(
+        createThreadDto.type,
+        createThreadDto.email,
+      );
+      console.log('threadIds', threadId);
+      // TODO
+      if (threadId) {
+        return res.json({
+          threadId,
+        });
+      } else {
+        const thread = await this.gptService.createThread(createThreadDto);
+        return res.json({
+          threadId: thread.id,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   @Get('/messages/:threadId')
