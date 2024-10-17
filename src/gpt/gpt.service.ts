@@ -7,6 +7,7 @@ import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { saveUserProfileFunction } from 'src/constants/function_calling';
 
 // https://blog.kooky-ai.com/g-18506
 // https://velog.io/@d159123/Nest.js-ChatGPT-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
@@ -80,11 +81,60 @@ export class GptService {
 
   async runAssistant(threadId: string, type: AssistantType) {
     console.log('Running assistant for thread' + threadId);
+    // TODO: Assistant Additional Instructions을 추가해야함
     const response = await this.openAiApi.beta.threads.runs.create(threadId, {
       assistant_id: this.ASSISTANT_ID_MAP[type],
+      additional_instructions: '',
+      tools: [
+        {
+          type: 'function',
+          function: saveUserProfileFunction,
+        },
+      ],
     });
-    console.log('Assistant response', response);
+    console.log('Assistant response2', response, 'function calling');
     return response;
+  }
+
+  // https://platform.openai.com/docs/assistants/tools/function-calling?context=without-streaming
+  async handleRequiresAction(
+    run: OpenAI.Beta.Threads.Runs.Run,
+    threadId: string,
+  ) {
+    // Check if there are tools that require outputs
+    if (
+      run.required_action &&
+      run.required_action.submit_tool_outputs &&
+      run.required_action.submit_tool_outputs.tool_calls
+    ) {
+      // Loop through each tool in the required action section
+      const toolOutputs =
+        run.required_action.submit_tool_outputs.tool_calls.map((tool) => {
+          if (tool.function.name === 'saveUserProfile') {
+            return {
+              tool_call_id: tool.id,
+              output: '57',
+            };
+          } else {
+            console.log('Tool not found');
+          }
+        });
+
+      // Submit all tool outputs at once after collecting them in a list
+      if (toolOutputs.length > 0) {
+        run = await this.openAiApi.beta.threads.runs.submitToolOutputsAndPoll(
+          threadId,
+          run.id,
+          { tool_outputs: toolOutputs },
+        );
+        console.log('Tool outputs submitted successfully.', toolOutputs);
+      } else {
+        console.log('No tool outputs to submit.');
+      }
+
+      // Check status after submitting tool outputs
+      return this.checkingStatus(threadId, run.id);
+    }
   }
 
   async checkingStatus(
@@ -114,7 +164,11 @@ export class GptService {
       });
 
       return messages;
+    } else if (status === 'requires_action') {
+      console.log(status);
+      return await this.handleRequiresAction(runObject, threadId);
     } else {
+      console.error('Run did not complete:');
       return null;
     }
   }
