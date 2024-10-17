@@ -14,17 +14,11 @@ import { UserEntity } from 'src/user/entities/user.entity';
 //https://stephenwalther.com/build-an-openai-assistant-app-with-nodejs-in-less-than-15-minutes/
 // const ASSISTANT_NAME = 'FUNNYMAN';
 
-const ASSISTANT_ID_MAP = {
-  Funny: 'asst_1ExgDmwmIqos4AT2O1nEKfBS',
-  Feedback: null,
-  Kind: null,
-  Default: null,
-};
-
 @Injectable()
 export class GptService {
   private readonly openAiApi: OpenAI;
   private readonly logger = new Logger(GptService.name);
+  private readonly ASSISTANT_ID_MAP: Record<AssistantType, string>;
   pollingIntervalId: NodeJS.Timeout;
 
   constructor(
@@ -40,6 +34,12 @@ export class GptService {
       apiKey: this.configService.get<string>('gpt.apiKey'),
     };
     this.openAiApi = new OpenAI(configuration);
+    this.ASSISTANT_ID_MAP = {
+      Funny: this.configService.get<string>('gpt.funnyAssistantId'),
+      Feedback: this.configService.get<string>('gpt.feedbackAssistantId'),
+      Kind: this.configService.get<string>('gpt.kindAssistantId'),
+      Default: this.configService.get<string>('gpt.defaultAssistantId'),
+    };
   }
 
   async createThread(createThreadDto: CreateThreadDto) {
@@ -81,7 +81,7 @@ export class GptService {
   async runAssistant(threadId: string, type: AssistantType) {
     console.log('Running assistant for thread' + threadId);
     const response = await this.openAiApi.beta.threads.runs.create(threadId, {
-      assistant_id: ASSISTANT_ID_MAP[type],
+      assistant_id: this.ASSISTANT_ID_MAP[type],
     });
     console.log('Assistant response', response);
     return response;
