@@ -1,9 +1,11 @@
+import { MemoryEntity } from 'src/memory/entities/memory.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -30,4 +32,7 @@ export class ThreadEntity {
     default: 'Default',
   })
   type: 'Funny' | 'Feedback' | 'Kind' | 'Default';
+
+  @OneToMany(() => MemoryEntity, (memory) => memory.threadId)
+  memories: MemoryEntity[];
 }

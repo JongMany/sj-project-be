@@ -11,6 +11,7 @@ import {
   saveUserProfileTools,
   saveUserProfile,
 } from 'src/constants/function_calling';
+import { MemoryService } from 'src/memory/memory.service';
 
 // https://blog.kooky-ai.com/g-18506
 // https://velog.io/@d159123/Nest.js-ChatGPT-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
@@ -28,6 +29,7 @@ export class GptService {
   constructor(
     private readonly configService: ConfigService,
     private jwtService: JwtService,
+    private readonly memoryService: MemoryService,
     @InjectRepository(ThreadEntity)
     private readonly threadRepository: Repository<ThreadEntity>,
     @InjectRepository(UserEntity)
@@ -222,25 +224,31 @@ export class GptService {
           console.log(runObject.required_action.submit_tool_outputs.tool_calls);
           const toolCalls =
             runObject.required_action.submit_tool_outputs.tool_calls;
-          const toolOutputs = toolCalls.map((toolCall) => {
-            const functionName = toolCall.function.name;
-            console.log('functionName', functionName);
-            if (functionName === 'saveUserProfile') {
-              const args = JSON.parse(toolCall.function.arguments);
-              const argsArray = Object.keys(args).map((key) => args[key]);
-              const output = saveUserProfile([args]);
+          const toolOutputs = await Promise.all(
+            toolCalls.map(async (toolCall) => {
+              const functionName = toolCall.function.name;
+              console.log('functionName', functionName);
 
-              return {
-                tool_call_id: toolCall.id,
-                output,
-              };
-            } else {
-              return {
-                tool_call_id: toolCall.id,
-                output: null,
-              };
-            }
-          });
+              if (functionName === 'saveUserProfile') {
+                const args = JSON.parse(toolCall.function.arguments);
+                const argsArray = Object.keys(args).map((key) => args[key]);
+                const output = await this.memoryService.createMemory({
+                  threadId,
+                  memoryData: argsArray,
+                });
+
+                return {
+                  tool_call_id: toolCall.id,
+                  output,
+                };
+              } else {
+                return {
+                  tool_call_id: toolCall.id,
+                  output: null,
+                };
+              }
+            }),
+          );
           console.log('Tool outputs:', toolOutputs);
           await this.openAiApi.beta.threads.runs.submitToolOutputs(
             threadId,
@@ -291,5 +299,11 @@ export class GptService {
 
     const thread = user.threads.find((thread) => thread.type === assistantType);
     return thread?.threadId || '';
+  }
+
+  async findThreadById(threadId: string) {
+    return this.threadRepository.findOne({
+      where: { threadId },
+    });
   }
 }
