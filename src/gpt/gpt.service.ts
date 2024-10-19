@@ -7,7 +7,11 @@ import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
-import { saveUserProfileFunction } from 'src/constants/function_calling';
+import {
+  saveUserProfileTools,
+  saveUserProfile,
+} from 'src/constants/function_calling';
+import { MemoryService } from 'src/memory/memory.service';
 
 // https://blog.kooky-ai.com/g-18506
 // https://velog.io/@d159123/Nest.js-ChatGPT-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
@@ -25,6 +29,7 @@ export class GptService {
   constructor(
     private readonly configService: ConfigService,
     private jwtService: JwtService,
+    private readonly memoryService: MemoryService,
     @InjectRepository(ThreadEntity)
     private readonly threadRepository: Repository<ThreadEntity>,
     @InjectRepository(UserEntity)
@@ -44,7 +49,7 @@ export class GptService {
   }
 
   async createThread(createThreadDto: CreateThreadDto) {
-    const thread = await this.openAiApi.beta.threads.create();
+    const thread = await this.openAiApi.beta.threads.create({});
     const user = await this.userRepository.findOne({
       where: { email: createThreadDto.email },
     });
@@ -82,95 +87,197 @@ export class GptService {
   async runAssistant(threadId: string, type: AssistantType) {
     console.log('Running assistant for thread' + threadId);
     // TODO: Assistant Additional Instructions을 추가해야함
-    const response = await this.openAiApi.beta.threads.runs.create(threadId, {
-      assistant_id: this.ASSISTANT_ID_MAP[type],
-      additional_instructions: '',
-      tools: [
-        {
-          type: 'function',
-          function: saveUserProfileFunction,
-        },
-      ],
-    });
-    console.log('Assistant response2', response, 'function calling');
+    const response = await this.openAiApi.beta.threads.runs.createAndPoll(
+      threadId,
+      {
+        assistant_id: this.ASSISTANT_ID_MAP[type],
+        tool_choice: 'auto', // required는 오래 걸림
+        tools: [
+          {
+            type: 'function',
+            function: saveUserProfileTools,
+          },
+        ],
+        additional_instructions: '',
+      },
+    );
+    console.log('Assistant response2', response);
     return response;
   }
 
   // https://platform.openai.com/docs/assistants/tools/function-calling?context=without-streaming
-  async handleRequiresAction(
-    run: OpenAI.Beta.Threads.Runs.Run,
-    threadId: string,
-  ) {
-    // Check if there are tools that require outputs
-    if (
-      run.required_action &&
-      run.required_action.submit_tool_outputs &&
-      run.required_action.submit_tool_outputs.tool_calls
-    ) {
-      // Loop through each tool in the required action section
-      const toolOutputs =
-        run.required_action.submit_tool_outputs.tool_calls.map((tool) => {
-          if (tool.function.name === 'saveUserProfile') {
-            return {
-              tool_call_id: tool.id,
-              output: '57',
-            };
-          } else {
-            console.log('Tool not found');
-          }
-        });
+  // async handleRequiresAction(
+  //   run: OpenAI.Beta.Threads.Runs.Run,
+  //   threadId: string,
+  // ) {
+  //   // Check if there are tools that require outputs
+  //   try {
+  //     if (
+  //       run.required_action &&
+  //       run.required_action.submit_tool_outputs &&
+  //       run.required_action.submit_tool_outputs.tool_calls
+  //     ) {
+  //       console.log('Tool outputs required.');
+  //       // Loop through each tool in the required action section
+  //       const toolOutputs = run.required_action.submit_tool_outputs.tool_calls
+  //         .map((tool) => {
+  //           console.log('Tool function name : ', tool.function.name);
+  //           if (tool.function.name === ' saveUserProfile') {
+  //             return {
+  //               tool_call_id: tool.id,
+  //               output: '57',
+  //             };
+  //           } else {
+  //             console.log('Tool not found');
+  //           }
+  //         })
+  //         .filter((output) => output !== undefined);
+  //       console.log('Tool outputs:', toolOutputs);
+  //       // Submit all tool outputs at once after collecting them in a list
+  //       if (toolOutputs && toolOutputs.length > 0) {
+  //         run = await this.openAiApi.beta.threads.runs.submitToolOutputsAndPoll(
+  //           threadId,
+  //           run.id,
+  //           { tool_outputs: toolOutputs },
+  //         );
+  //         console.log('Tool outputs submitted successfully.', toolOutputs);
+  //       } else {
+  //         console.log('No tool outputs to submit.');
+  //       }
 
-      // Submit all tool outputs at once after collecting them in a list
-      if (toolOutputs.length > 0) {
-        run = await this.openAiApi.beta.threads.runs.submitToolOutputsAndPoll(
-          threadId,
-          run.id,
-          { tool_outputs: toolOutputs },
-        );
-        console.log('Tool outputs submitted successfully.', toolOutputs);
-      } else {
-        console.log('No tool outputs to submit.');
-      }
-
-      // Check status after submitting tool outputs
-      return this.checkingStatus(threadId, run.id);
-    }
-  }
+  //       // Check status after submitting tool outputs
+  //       return this.checkingStatus(threadId, run.id);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error handling required action:', error);
+  //     return this.openAiApi.beta.threads.runs.cancel(threadId, run.id);
+  //   }
+  // }
 
   async checkingStatus(
     threadId: string,
     runId: string,
   ): Promise<OpenAI.Beta.Threads.Messages.MessageContent[][] | null> {
-    const runObject = await this.openAiApi.beta.threads.runs.retrieve(
+    let runObject = await this.openAiApi.beta.threads.runs.retrieve(
       threadId,
       runId,
     );
 
-    const status = runObject.status;
+    let status = runObject.status;
 
-    console.log('Run Object', runObject);
-    console.log('Run status', status);
+    // if (status === 'completed') {
+    //   clearInterval(this.pollingIntervalId);
 
-    if (status === 'completed') {
-      clearInterval(this.pollingIntervalId);
+    //   const messagesList =
+    //     await this.openAiApi.beta.threads.messages.list(threadId);
+    //   const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
+    //   console.log('messagesList', messagesList);
 
-      const messagesList =
-        await this.openAiApi.beta.threads.messages.list(threadId);
-      const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
-      console.log('messagesList', messagesList);
+    //   messagesList.data.forEach((message) => {
+    //     messages.push(message.content);
+    //   });
 
-      messagesList.data.forEach((message) => {
-        messages.push(message.content);
-      });
+    //   return messages;
+    // } else if (status === 'requires_action') {
+    //   console.log(status);
+    //   return await this.handleRequiresAction(runObject, threadId);
+    // } else {
+    //   console.error('Run did not complete:');
+    //   return null;
+    // }
+    // v3
+    // if (status === 'completed') {
+    //   const messagesList =
+    //     await this.openAiApi.beta.threads.messages.list(threadId);
+    //   const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
+    //   // console.log('messagesList', messagesList);
+    //   console.log('messagesList is shown');
 
-      return messages;
-    } else if (status === 'requires_action') {
-      console.log(status);
-      return await this.handleRequiresAction(runObject, threadId);
-    } else {
-      console.error('Run did not complete:');
-      return null;
+    //   messagesList.data.forEach((message) => {
+    //     messages.push(message.content);
+    //   });
+
+    //   return messages;
+    // }
+
+    // if (status === 'requires_action') {
+    //   this.handleRequiresAction(runObject, threadId);
+    // }
+    // if (['failed', 'cancelled', 'expired'].includes(status)) {
+    //   console.log(`Run status is '${status}'`);
+    //   return null;
+    // }
+
+    while (status !== 'completed') {
+      // await new Promise((resolve) => setTimeout(resolve, 1200));
+      runObject = await this.openAiApi.beta.threads.runs.retrieve(
+        threadId,
+        runId,
+      );
+
+      status = runObject.status;
+
+      console.log('Run status is', status);
+      if (status === 'requires_action') {
+        // this.handleRequiresAction(runObject, threadId);
+        try {
+          console.log(runObject.required_action.submit_tool_outputs.tool_calls);
+          const toolCalls =
+            runObject.required_action.submit_tool_outputs.tool_calls;
+          const toolOutputs = await Promise.all(
+            toolCalls.map(async (toolCall) => {
+              const functionName = toolCall.function.name;
+              console.log('functionName', functionName);
+
+              if (functionName === 'saveUserProfile') {
+                const args = JSON.parse(toolCall.function.arguments);
+                const argsArray = Object.keys(args).map((key) => args[key]);
+                const output = await this.memoryService.createMemory({
+                  threadId,
+                  memoryData: argsArray,
+                });
+
+                return {
+                  tool_call_id: toolCall.id,
+                  output,
+                };
+              } else {
+                return {
+                  tool_call_id: toolCall.id,
+                  output: null,
+                };
+              }
+            }),
+          );
+          console.log('Tool outputs:', toolOutputs);
+          await this.openAiApi.beta.threads.runs.submitToolOutputs(
+            threadId,
+            runId,
+            { tool_outputs: toolOutputs },
+          );
+        } catch (error) {
+          console.log('Error handling required action:', error);
+          await this.openAiApi.beta.threads.runs.cancel(threadId, runId);
+        }
+      }
+
+      if (['failed', 'cancelled', 'expired'].includes(status)) {
+        console.log(`Run status is '${status}'`);
+        break;
+      }
     }
+
+    const messagesList =
+      await this.openAiApi.beta.threads.messages.list(threadId);
+    const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
+    // console.log('messagesList', messagesList);
+    console.log('messagesList is shown');
+
+    messagesList.data.forEach((message) => {
+      messages.push(message.content);
+    });
+
+    return messages;
   }
 
   async getThreads(email: string) {
@@ -192,5 +299,11 @@ export class GptService {
 
     const thread = user.threads.find((thread) => thread.type === assistantType);
     return thread?.threadId || '';
+  }
+
+  async findThreadById(threadId: string) {
+    return this.threadRepository.findOne({
+      where: { threadId },
+    });
   }
 }

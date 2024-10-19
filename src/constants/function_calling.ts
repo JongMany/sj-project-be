@@ -1,5 +1,5 @@
-export const saveUserProfileFunction = {
-  name: 'save_user_profile',
+export const saveUserProfileTools = {
+  name: 'saveUserProfile',
   description:
     'Saves all relevant user profile data, preferences, and conversation facts to the database',
   parameters: {
@@ -79,3 +79,8 @@ export const saveUserProfileFunction = {
     required: ['userId', 'name'],
   },
 };
+
+export function saveUserProfile(params) {
+  console.log(params);
+  return JSON.stringify(params);
+}

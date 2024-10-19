@@ -12,6 +12,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { join } from 'path';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middleware';
 import { GptModule } from './gpt/gpt.module';
+import { MemoryModule } from './memory/memory.module';
 import appConfig from 'src/config/app.config';
 import dbConfig from 'src/config/db.config';
 import gptConfig from 'src/config/gpt.config';
@@ -82,6 +83,7 @@ import gptConfig from 'src/config/gpt.config';
     RedisCacheModule,
     UserModule,
     GptModule,
+    MemoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
