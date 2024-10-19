@@ -16,8 +16,8 @@ export class MemoryEntity {
     onDelete: 'CASCADE',
     nullable: false,
   })
-  @JoinColumn({ name: 'thread' })
-  threadId: ThreadEntity;
+  @JoinColumn({ name: 'threadId' })
+  thread: ThreadEntity;
 
   @Column({ type: 'jsonb' })
   data: any; // 비정형 데이터를 저장할 필드

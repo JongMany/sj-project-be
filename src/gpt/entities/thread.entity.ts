@@ -33,6 +33,6 @@ export class ThreadEntity {
   })
   type: 'Funny' | 'Feedback' | 'Kind' | 'Default';
 
-  @OneToMany(() => MemoryEntity, (memory) => memory.threadId)
+  @OneToMany(() => MemoryEntity, (memory) => memory.thread)
   memories: MemoryEntity[];
 }
