@@ -231,10 +231,14 @@ export class GptService {
 
               if (functionName === 'saveUserProfile') {
                 const args = JSON.parse(toolCall.function.arguments);
-                const argsArray = Object.keys(args).map((key) => args[key]);
+                // const argsArray = Object.keys(args).map((key) => args[key]);
+
+                // console.log('argsArray', argsArray);
+                console.log('args', args);
+
                 const output = await this.memoryService.createMemory({
                   threadId,
-                  memoryData: argsArray,
+                  memoryData: args,
                 });
 
                 return {

@@ -54,7 +54,6 @@ export class GptController {
   @UseGuards(JwtAuthGuard)
   async getMessages(@Param('threadId') threadId: string, @Response() res) {
     const messages = await this.gptService.getMessages(threadId);
-    console.log(messages.data);
     return res.json({
       messages: messages.data.reverse(),
       success: true,

@@ -4,6 +4,7 @@ import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { validate as isUuid } from 'uuid';
 import { MemoryEntity } from 'src/memory/entities/memory.entity';
 import { Repository } from 'typeorm';
+import { UserProfileParams } from 'src/constants/function_calling';
 
 @Injectable()
 export class MemoryService {
@@ -14,7 +15,10 @@ export class MemoryService {
     private readonly threadRepository: Repository<ThreadEntity>,
   ) {}
 
-  async createMemory(createMemoryDto: { threadId: string; memoryData: any }) {
+  async createMemory(createMemoryDto: {
+    threadId: string;
+    memoryData: UserProfileParams;
+  }) {
     const { threadId, memoryData } = createMemoryDto;
     // threadId가 UUID 형식인지 확인
 
@@ -27,17 +31,21 @@ export class MemoryService {
     }
 
     // MemoryEntity 생성
-    const memory = this.memoryRepository.create({
-      thread,
-      data: memoryData,
+    Object.entries(memoryData).forEach(async ([key, value]) => {
+      // userId, name은 제외하고 저장
+      if (!['userId', 'name'].includes(key)) {
+        const memory = this.memoryRepository.create({
+          thread,
+          data: { [key]: value },
+        });
+        // 저장
+        await this.memoryRepository.save(memory);
+      }
     });
 
-    // 저장
-    await this.memoryRepository.save(memory);
+    console.log('Memory created: ', memoryData);
 
-    console.log('Memory created');
-
-    return JSON.stringify(memory);
+    return JSON.stringify(memoryData);
   }
 
   async getMemoriesByThreadId(threadId: string): Promise<MemoryEntity[]> {
