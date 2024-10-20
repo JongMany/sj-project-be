@@ -12,7 +12,7 @@ env: # 공통 환경 변수를 설정합니다.
   ECR_REGISTRY: 214925768882.dkr.ecr.ap-northeast-2.amazonaws.com/sj-graduate # ECR 레지스트리 URL을 설정
 
 jobs: # 실행할 작업을 정의합니다.
-  deploy: # 'deploy'라는 작업을 정의합니다.
+  ci: # 'deploy'라는 작업을 정의합니다.
     name: Deploy # 작업의 이름을 'Deploy'로 설정
     runs-on: ubuntu-latest # 최신 Ubuntu 버전에서 실행되도록 설정
     # environment: production # 이 작업이 'production' 환경에서 실행됨을 정의
@@ -31,6 +31,55 @@ jobs: # 실행할 작업을 정의합니다.
       - name: Login To Amazon ECR # Amazon ECR에 로그인하는 단계
         id: login-ecr # 이 단계의 ID를 'login-ecr'로 설정 (후속 단계에서 참조 가능)
         uses: aws-actions/amazon-ecr-login@v1 # Amazon ECR 로그인 액션 사용
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile.prod ./
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Save image tag to file
+        run: echo "${IMAGE_TAG}" > image-tag.txt
+
+      - name: Verify image tag file
+        run: cat image-tag.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-tag
+          path: image-tag.txt
+
+  cd:
+    name: BE-Deploy Docker Image to Server
+    runs-on: [self-hosted, study-log-server]
+    needs: ci
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: image-tag
+
+      - name: Read image tag
+        id: read-image-tag
+        run: |
+          IMAGE_TAG=$(cat image-tag.txt)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_IAM_ACCESS }}
+          aws-secret-access-key: ${{ secrets.AWS_IAM_SECRET }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Create .env file from secrets
         run: |
@@ -66,33 +115,15 @@ jobs: # 실행할 작업을 정의합니다.
           echo AWS_IAM_SECRET=${{ secrets.AWS_IAM_SECRET }} >> .env
           echo AWS_ECR_BE=${{ secrets.AWS_ECR_BE }} >> .env
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Set permissions for .env file
+        run: chmod 600 .env
+      - name: Verify .env file contents
+        run: cat .env
+
+      - name: Pull image from Amazon ECR and restart Docker Container
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./Dockerfile.prod ./
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-
-      - name: Save image tag to file
-        run: echo "${IMAGE_TAG}" > image-tag.txt
-
-      - name: Verify image tag file
-        run: cat image-tag.txt
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: image-tag
-          path: image-tag.txt
-      # - name: Build, tag, and push image to Amazon ECR # Docker 이미지를 빌드, 태그, ECR에 푸시하는 단계
-      #   id: build-image # 이 단계의 ID를 'build-image'로 설정
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # ECR 레지스트리 URL 설정
-      #     IMAGE_TAG: ${{ github.sha }} # GitHub의 커밋 SHA 값을 이미지 태그로 사용
-      #   run: |
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ./server/Dockerfile.prod ./server  # 지정된 Dockerfile을 사용하여 이미지를 빌드하고 태그 지정
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  # 빌드된 이미지를 ECR에 푸시
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"  # 빌드된 이미지 URL을 워크플로우 출력으로 설정
+          docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker stop study-log-server || true && docker rm study-log-server || true
+          docker run -d --name study-log-server -p 8080:8080 --restart unless-stopped \
+            --env-file .env \
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
