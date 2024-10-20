@@ -98,7 +98,7 @@ jobs: # 실행할 작업을 정의합니다.
           echo DB_NAME=sjGraduate >> .env
 
           # REDIS
-          echo REDIS_HOST=localhost >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
           echo REDIS_PORT=6379 >> .env
           echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
 

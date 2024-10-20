@@ -22,7 +22,7 @@ import gptConfig from 'src/config/gpt.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env`,
-      load: [appConfig, dbConfig, gptConfig], // * 여러개의 config를 로드할 수 있다.
+      load: [appConfig, dbConfig, gptConfig], // * 여러개의 config를 로드할 수 있다
       // validationSchema: Joi.object({
       //   // API
       //   PORT: Joi.number().required(),
