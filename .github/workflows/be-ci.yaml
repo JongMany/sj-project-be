@@ -56,7 +56,7 @@ jobs: # 실행할 작업을 정의합니다.
 
   cd:
     name: BE-Deploy Docker Image to Server
-    runs-on: [self-hosted, study-log-server]
+    runs-on: [self-hosted, sj-graduate]
     needs: ci
     steps:
       - name: Download artifact
@@ -123,7 +123,15 @@ jobs: # 실행할 작업을 정의합니다.
       - name: Pull image from Amazon ECR and restart Docker Container
         run: |
           docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker stop study-log-server || true && docker rm study-log-server || true
-          docker run -d --name study-log-server -p 8080:8080 --restart unless-stopped \
+          docker stop sj-graduate || true && docker rm sj-graduate || true
+          docker run -d --name sj-graduate -p 8080:8080 --restart unless-stopped \
             --env-file .env \
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+      # - name: 기존 EC2에 저장되어있는 이미지 삭제
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.EC2_IP }}
+      #     username: ${{ secrets.EC2_USERNAME }}
+      #     key: ${{ secrets.EC2_SSH_KEY }}
+      #     script: |
+      #       sudo docker images -q | xargs -r docker rmi
