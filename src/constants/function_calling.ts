@@ -1,3 +1,22 @@
+export interface UserProfileParams {
+  userId?: string; // optional
+  name?: string; // optional
+  age?: number;
+  location?: string;
+  preferences?: {
+    favorite_color?: string;
+    favorite_food?: string;
+    preferred_language?: string;
+    hobbies?: string[];
+  };
+  recent_activities?: string[];
+  device_info?: {
+    device_type?: string;
+    os?: string;
+  };
+  conversation_context?: string[];
+}
+
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
@@ -76,7 +95,7 @@ export const saveUserProfileTools = {
         description: 'Relevant facts gathered during the conversation',
       },
     },
-    required: ['userId', 'name'],
+    // required: ['userId', 'name'],
   },
 };
 

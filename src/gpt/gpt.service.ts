@@ -231,10 +231,14 @@ export class GptService {
 
               if (functionName === 'saveUserProfile') {
                 const args = JSON.parse(toolCall.function.arguments);
-                const argsArray = Object.keys(args).map((key) => args[key]);
+                // const argsArray = Object.keys(args).map((key) => args[key]);
+
+                // console.log('argsArray', argsArray);
+                console.log('args', args);
+
                 const output = await this.memoryService.createMemory({
                   threadId,
-                  memoryData: argsArray,
+                  memoryData: args,
                 });
 
                 return {
@@ -256,6 +260,7 @@ export class GptService {
             { tool_outputs: toolOutputs },
           );
         } catch (error) {
+          // required action이 발생했을 때, 에러가 발생하면 run을 취소하고 종료(취소를 하지 않으면 계속해서 active 상태가 되어, 채팅을 못치게 된다)
           console.log('Error handling required action:', error);
           await this.openAiApi.beta.threads.runs.cancel(threadId, runId);
         }

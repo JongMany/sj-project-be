@@ -10,7 +10,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { GptService } from './gpt.service';
-import { CreateThreadDto } from 'src/gpt/dto/create-thread.dto';
+import { AssistantType, CreateThreadDto } from 'src/gpt/dto/create-thread.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-access.guard';
 import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
 
@@ -54,7 +54,6 @@ export class GptController {
   @UseGuards(JwtAuthGuard)
   async getMessages(@Param('threadId') threadId: string, @Response() res) {
     const messages = await this.gptService.getMessages(threadId);
-    console.log(messages.data);
     return res.json({
       messages: messages.data.reverse(),
       success: true,
@@ -71,6 +70,22 @@ export class GptController {
       success: true,
     });
   }
+
+  @Get('/thread/:type')
+  @UseGuards(JwtAuthGuard)
+  async getThreadIdByType(
+    @Param('type') type: AssistantType,
+    @CurrentUser() email: string,
+    @Response() res,
+  ) {
+    const threadId = await this.gptService.findThreadIdByType(type, email);
+    console.log('threadId', threadId, email);
+    return res.json({
+      threadId,
+      success: true,
+    });
+  }
+
   @Post('/message')
   async sendMessage(@Body() body, @Response() res) {
     const { message: userMessage, threadId, type } = body;
