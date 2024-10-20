@@ -77,9 +77,13 @@ jobs: # 실행할 작업을 정의합니다.
           aws-secret-access-key: ${{ secrets.AWS_IAM_SECRET }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
       - name: Create .env file from secrets
         run: |
