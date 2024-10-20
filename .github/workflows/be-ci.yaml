@@ -8,8 +8,8 @@ on:
 
 env: # 공통 환경 변수를 설정합니다.
   AWS_REGION: ap-northeast-2 # AWS 리전을 서울 리전으로 설정
-  ECR_REPOSITORY: sj-graduate # ECR 저장소 이름을 'study-log'로 설정
-  ECR_REGISTRY: 214925768882.dkr.ecr.ap-northeast-2.amazonaws.com/sj-graduate # ECR 레지스트리 URL을 설정
+  ECR_REPOSITORY: sj-graduate # ECR 저장소 이름을 'sj-graduate'로 설정
+  ECR_REGISTRY: 214925768882.dkr.ecr.ap-northeast-2.amazonaws.com # ECR 레지스트리 URL을 설정
 
 jobs: # 실행할 작업을 정의합니다.
   ci: # 'deploy'라는 작업을 정의합니다.
