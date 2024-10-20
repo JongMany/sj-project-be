@@ -77,13 +77,9 @@ jobs: # 실행할 작업을 정의합니다.
           aws-secret-access-key: ${{ secrets.AWS_IAM_SECRET }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
       - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Create .env file from secrets
         run: |
@@ -126,9 +122,9 @@ jobs: # 실행할 작업을 정의합니다.
 
       - name: Pull image from Amazon ECR and restart Docker Container
         run: |
-          sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          sudo docker stop sj-graduate || true && sudo docker rm sj-graduate || true
-          sudo docker run -d --name sj-graduate -p 8080:8080 --restart unless-stopped \
+          docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker stop sj-graduate || true && docker rm sj-graduate || true
+          docker run -d --name sj-graduate -p 8080:8080 --restart unless-stopped \
             --env-file .env \
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
       # - name: 기존 EC2에 저장되어있는 이미지 삭제
