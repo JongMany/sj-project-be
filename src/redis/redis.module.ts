@@ -12,7 +12,8 @@ import { IORedisKey } from 'src/redis/redis.constants';
     {
       provide: IORedisKey,
       useFactory: async (configService: ConfigService) => {
-        return new Redis(configService.get('REDIS_URL'));
+        console.log('REDIS_URL', configService.get('db.redis.url'));
+        return new Redis(configService.get('db.redis.ur'));
       },
       inject: [ConfigService],
     },

@@ -71,9 +71,11 @@ import gptConfig from 'src/config/gpt.config';
       useFactory: async (configService: ConfigService) => {
         return {
           config: {
-            host: configService.get('db.redis.host'),
-            port: configService.get('db.redis.port'),
-            password: configService.get('db.redis.password'),
+            // host: configService.get('db.redis.host'),
+            // port: configService.get('db.redis.port'),
+            // password: configService.get('db.redis.password'),
+            url: configService.get('db.redis.url'),
+            password: configService.get('db.redis.password') || null,
           },
         };
       },

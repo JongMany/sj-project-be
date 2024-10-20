@@ -13,5 +13,6 @@ export default registerAs('db', () => ({
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT, 10),
     password: process.env.REDIS_PASSWORD,
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
   },
 }));
