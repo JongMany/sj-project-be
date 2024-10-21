@@ -98,7 +98,8 @@ export class GptService {
             function: saveUserProfileTools,
           },
         ],
-        additional_instructions: '',
+        additional_instructions:
+          'Please save user profile when user gives user information',
       },
     );
     console.log('Assistant response2', response);
