@@ -7,10 +7,7 @@ import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
-import {
-  saveUserProfileTools,
-  saveUserProfile,
-} from 'src/constants/function_calling';
+import { saveUserProfileTools } from 'src/constants/function_calling';
 import { MemoryService } from 'src/memory/memory.service';
 
 // https://blog.kooky-ai.com/g-18506
@@ -91,7 +88,7 @@ export class GptService {
       threadId,
       {
         assistant_id: this.ASSISTANT_ID_MAP[type],
-        tool_choice: 'auto', // required는 오래 걸림
+        tool_choice: 'required', // required는 오래 걸림 / auto는 빠름
         tools: [
           {
             type: 'function',
