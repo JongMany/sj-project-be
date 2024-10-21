@@ -88,7 +88,7 @@ export class GptService {
       threadId,
       {
         assistant_id: this.ASSISTANT_ID_MAP[type],
-        tool_choice: 'required', // required는 오래 걸림 / auto는 빠름
+        tool_choice: 'auto', // required는 오래 걸림 / auto는 빠름
         tools: [
           {
             type: 'function',
