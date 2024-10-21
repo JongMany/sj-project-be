@@ -99,7 +99,7 @@ export class GptService {
           },
         ],
         additional_instructions:
-          'Please save user profile when user gives user information',
+          '\n 6. Please save user profile when user gives user information',
       },
     );
     console.log('Assistant response2', response);
