@@ -164,6 +164,7 @@ export class GptService {
     );
 
     let status = runObject.status;
+    console.log('Run status is', status);
 
     // if (status === 'completed') {
     //   clearInterval(this.pollingIntervalId);
