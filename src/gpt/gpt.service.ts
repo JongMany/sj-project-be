@@ -99,7 +99,7 @@ export class GptService {
           },
         ],
         additional_instructions:
-          '\n 6. Please call function_calling when user gives user information',
+          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 사용해서 required_action 상태로 만들어줘!',
       },
     );
     console.log('Assistant response2', response);
