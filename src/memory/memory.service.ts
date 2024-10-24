@@ -159,10 +159,11 @@ export class MemoryService {
 
     // 변경된 MemoryEntity 저장
     await this.userProfileDetailRepository.save(memory);
+    console.log('memory', memory);
     const memories = await this.userProfileDetailRepository.find({
-      where: { id: memory.memory.id },
+      where: { memory: memory.memory },
     });
     console.log('memories', memories);
-    return memories;
+    return memories.filter((value) => value.isShow);
   }
 }
