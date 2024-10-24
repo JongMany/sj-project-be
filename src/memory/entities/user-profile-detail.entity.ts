@@ -27,4 +27,7 @@ export class UserProfileDetailEntity {
 
   @Column()
   description: string; // 실제 값 (예: '30 years old', '커피 마시기')
+
+  @Column({ default: true })
+  isShow: boolean; // 프로필에 표시할지 여부
 }

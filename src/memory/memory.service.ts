@@ -127,7 +127,7 @@ export class MemoryService {
       },
     });
 
-    return userProfileDetails;
+    return userProfileDetails.filter((value) => value.isShow);
   }
 
   private async saveProfileDetail(
