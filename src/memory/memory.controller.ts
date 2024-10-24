@@ -10,7 +10,6 @@ export class MemoryController {
   @UseGuards(JwtAuthGuard)
   async getMemories(@Param('threadId') threadId: string, @Response() res) {
     const memories = await this.memoryService.getMemoriesByThreadId(threadId);
-    console.log('memories', memories);
     return res.json({
       memories: memories,
       success: true,
