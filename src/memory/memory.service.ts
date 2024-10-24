@@ -143,4 +143,26 @@ export class MemoryService {
     profileDetail.memory = memory; // memoryId 연결
     await this.userProfileDetailRepository.save(profileDetail);
   }
+
+  async deleteMemory(memoryId: string) {
+    const memory = await this.userProfileDetailRepository.findOne({
+      where: { id: memoryId },
+      relations: ['memory'],
+    });
+
+    if (!memory) {
+      throw new Error('Memory not found');
+    }
+
+    // isShow 값 업데이트
+    memory.isShow = false;
+
+    // 변경된 MemoryEntity 저장
+    await this.userProfileDetailRepository.save(memory);
+    const memories = await this.userProfileDetailRepository.find({
+      where: { id: memory.memory.id },
+    });
+    console.log('memories', memories);
+    return memories;
+  }
 }
