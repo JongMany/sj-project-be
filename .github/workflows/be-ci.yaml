@@ -1,8 +1,8 @@
 name: Dockerizing to Amazon ECR # 워크플로우의 이름을 'Dockerizing to Amazon ECR'로 설정합니다.
 
 on:
-  push: # 특정 브랜치에 코드가 푸시될 때 워크플로우가 트리거됩니다.
-    branches: ['main'] # 'main' 브랜치에 푸시될 때만 워크플로우 실행
+  # push: # 특정 브랜치에 코드가 푸시될 때 워크플로우가 트리거됩니다.
+  # branches: ['main'] # 'main' 브랜치에 푸시될 때만 워크플로우 실행
   pull_request: # 풀 리퀘스트가 열리거나 업데이트될 때 트리거됩니다.
     branches: ['main'] # 'main' 브랜치에 대한 풀 리퀘스트일 때만 실행
 

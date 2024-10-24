@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ThreadEntity } from 'src/gpt/entities/thread.entity';
-import { validate as isUuid } from 'uuid';
 import { MemoryEntity } from 'src/memory/entities/memory.entity';
 import { Repository } from 'typeorm';
 import { UserProfileParams } from 'src/constants/function_calling';
+import { UserProfileDetailEntity } from 'src/memory/entities/user-profile-detail.entity';
 
 @Injectable()
 export class MemoryService {
@@ -13,14 +13,27 @@ export class MemoryService {
     private memoryRepository: Repository<MemoryEntity>,
     @InjectRepository(ThreadEntity)
     private readonly threadRepository: Repository<ThreadEntity>,
+    @InjectRepository(UserProfileDetailEntity)
+    private readonly profileDetailRepository: Repository<UserProfileDetailEntity>,
   ) {}
 
   async createMemory(createMemoryDto: {
     threadId: string;
-    memoryData: UserProfileParams;
+    // memoryData: UserProfileParams;
+    memoryData: any;
   }) {
     const { threadId, memoryData } = createMemoryDto;
-    // threadId가 UUID 형식인지 확인
+    console.log('createMemoryDto', createMemoryDto.memoryData);
+
+    const {
+      userId,
+      name,
+      age,
+      preferences,
+      things_to_do,
+      things_done,
+      things_to_do_later,
+    } = memoryData;
 
     // threadId로 ThreadEntity 찾기
     const thread = await this.threadRepository.findOne({
@@ -30,20 +43,69 @@ export class MemoryService {
       throw new Error('Thread not found');
     }
 
-    // MemoryEntity 생성
-    Object.entries(memoryData).forEach(async ([key, value]) => {
-      // userId, name은 제외하고 저장
-      if (!['userId', 'name'].includes(key)) {
-        const memory = this.memoryRepository.create({
-          thread,
-          data: { [key]: value },
-        });
-        // 저장
-        await this.memoryRepository.save(memory);
-      }
+    // threadId로 MemoryEntity가 이미 존재하는지 확인
+    let memory = await this.memoryRepository.findOne({
+      where: { thread: { threadId: threadId } },
     });
 
-    console.log('Memory created: ', memoryData);
+    // MemoryEntity가 없으면 새로 생성
+    if (!memory) {
+      memory = new MemoryEntity();
+      memory.thread = thread; // ThreadEntity와 연결
+      memory = await this.memoryRepository.save(memory); // 저장
+    }
+
+    // TODO: 나이가 있으면 저장을 안해야하는지...
+    if (age) {
+      await this.saveProfileDetail(userId, 'age', `${age}`, memory);
+    }
+
+    if (preferences) {
+      if (preferences.favorite_color) {
+        await this.saveProfileDetail(
+          userId,
+          'favorite_color',
+          `${preferences.favorite_color}`,
+          memory,
+        );
+      }
+      if (preferences.favorite_food) {
+        await this.saveProfileDetail(
+          userId,
+          'favorite_food',
+          `${preferences.favorite_food}`,
+          memory,
+        );
+      }
+      if (preferences.hobbies) {
+        for (const hobby of preferences.hobbies) {
+          await this.saveProfileDetail(userId, 'hobby', `${hobby}`, memory);
+        }
+      }
+    }
+
+    if (things_to_do) {
+      for (const task of things_to_do) {
+        await this.saveProfileDetail(userId, 'things_to_do', `${task}`, memory);
+      }
+    }
+
+    if (things_done) {
+      for (const done of things_done) {
+        await this.saveProfileDetail(userId, 'things_done', `${done}`, memory);
+      }
+    }
+
+    if (things_to_do_later) {
+      for (const task of things_to_do_later) {
+        await this.saveProfileDetail(
+          userId,
+          'things_to_do_later',
+          `${task}`,
+          memory,
+        );
+      }
+    }
 
     return JSON.stringify(memoryData);
   }
@@ -56,5 +118,19 @@ export class MemoryService {
       },
       // relations: ['thread'], // 필요 시 연관 관계를 로드
     });
+  }
+
+  private async saveProfileDetail(
+    userId: string,
+    type: string,
+    description: string,
+    memory: MemoryEntity,
+  ): Promise<void> {
+    const profileDetail = new UserProfileDetailEntity();
+    profileDetail.userId = userId;
+    profileDetail.type = type;
+    profileDetail.description = description;
+    profileDetail.memory = memory; // memoryId 연결
+    await this.profileDetailRepository.save(profileDetail);
   }
 }
