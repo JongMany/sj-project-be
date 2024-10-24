@@ -14,7 +14,7 @@ export class MemoryService {
     @InjectRepository(ThreadEntity)
     private readonly threadRepository: Repository<ThreadEntity>,
     @InjectRepository(UserProfileDetailEntity)
-    private readonly profileDetailRepository: Repository<UserProfileDetailEntity>,
+    private readonly userProfileDetailRepository: Repository<UserProfileDetailEntity>,
   ) {}
 
   async createMemory(createMemoryDto: {
@@ -110,14 +110,24 @@ export class MemoryService {
     return JSON.stringify(memoryData);
   }
 
-  async getMemoriesByThreadId(threadId: string): Promise<MemoryEntity[]> {
+  async getMemoriesByThreadId(
+    threadId: string,
+  ): Promise<UserProfileDetailEntity[]> {
     // threadId를 기반으로 Memory 리스트 가져오기
-    return this.memoryRepository.find({
+    const memory = await this.memoryRepository.find({
       where: {
         thread: { threadId: threadId }, // 관계된 ThreadEntity의 id를 사용하여 필터링
       },
       // relations: ['thread'], // 필요 시 연관 관계를 로드
     });
+
+    const userProfileDetails = await this.userProfileDetailRepository.find({
+      where: {
+        memory: memory,
+      },
+    });
+
+    return userProfileDetails;
   }
 
   private async saveProfileDetail(
@@ -131,6 +141,6 @@ export class MemoryService {
     profileDetail.type = type;
     profileDetail.description = description;
     profileDetail.memory = memory; // memoryId 연결
-    await this.profileDetailRepository.save(profileDetail);
+    await this.userProfileDetailRepository.save(profileDetail);
   }
 }
