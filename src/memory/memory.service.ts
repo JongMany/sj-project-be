@@ -5,6 +5,7 @@ import { MemoryEntity } from 'src/memory/entities/memory.entity';
 import { Repository } from 'typeorm';
 import { UserProfileParams } from 'src/constants/function_calling';
 import { UserProfileDetailEntity } from 'src/memory/entities/user-profile-detail.entity';
+import { EditMemoryDto } from 'src/memory/dto/edit-memory.dto';
 
 @Injectable()
 export class MemoryService {
@@ -159,11 +160,23 @@ export class MemoryService {
 
     // 변경된 MemoryEntity 저장
     await this.userProfileDetailRepository.save(memory);
-    console.log('memory', memory);
     const memories = await this.userProfileDetailRepository.find({
       where: { memory: memory.memory },
     });
-    console.log('memories', memories);
     return memories.filter((value) => value.isShow);
+  }
+
+  async updateMemory(memoryId: string, editMemoryDto: EditMemoryDto) {
+    const memory = await this.userProfileDetailRepository.findOne({
+      where: { id: memoryId },
+    });
+
+    if (!memory) {
+      throw new Error('Memory not found');
+    }
+
+    memory.description = editMemoryDto.description;
+
+    return await this.userProfileDetailRepository.save(memory);
   }
 }
