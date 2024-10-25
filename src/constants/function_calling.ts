@@ -19,7 +19,7 @@ export interface UserProfileParams {
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    'Saves user profile data, preferences, and other relevant facts to the database',
+    'Saves user profile data, preferences, and other relevant facts in full sentence form to the database.',
   parameters: {
     type: 'object',
     properties: {
@@ -29,11 +29,11 @@ export const saveUserProfileTools = {
       },
       name: {
         type: 'string',
-        description: 'The name of the user',
+        description: 'The name of the user (full sentence)',
       },
       age: {
         type: 'integer',
-        description: "The user's age",
+        description: "The user's age (full sentence)",
       },
       preferences: {
         type: 'object',
@@ -41,18 +41,18 @@ export const saveUserProfileTools = {
         properties: {
           favorite_color: {
             type: 'string',
-            description: "The user's favorite color",
+            description: "The user's favorite color (full sentence)",
           },
           favorite_food: {
             type: 'string',
-            description: "The user's favorite food",
+            description: "The user's favorite food (full sentence)",
           },
           hobbies: {
             type: 'array',
             items: {
               type: 'string',
             },
-            description: "The user's hobbies or interests",
+            description: "The user's hobbies or interests (full sentence)",
           },
         },
       },
@@ -61,21 +61,22 @@ export const saveUserProfileTools = {
         items: {
           type: 'string',
         },
-        description: 'Things the user wants to do or plans to do',
+        description:
+          'Things the user wants to do or plans to do (full sentence)',
       },
       things_done: {
         type: 'array',
         items: {
           type: 'string',
         },
-        description: 'Things the user has done',
+        description: 'Things the user has done (full sentence)',
       },
       things_to_do_later: {
         type: 'array',
         items: {
           type: 'string',
         },
-        description: 'Tasks the user needs to complete later',
+        description: 'Tasks the user needs to complete later (full sentence)',
       },
     },
     required: ['userId', 'name'],
