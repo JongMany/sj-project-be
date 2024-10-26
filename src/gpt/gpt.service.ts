@@ -243,6 +243,7 @@ export class GptService {
                 return {
                   tool_call_id: toolCall.id,
                   output,
+                  // output: JSON.stringify(args),
                 };
               } else {
                 return {

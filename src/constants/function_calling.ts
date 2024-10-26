@@ -16,70 +16,158 @@ export interface UserProfileParams {
   };
   conversation_context?: string[];
 }
+// export const saveUserProfileTools = {
+//   name: 'saveUserProfile',
+//   description:
+//     'Saves user profile data, preferences, and other relevant facts in full sentence form to the database.',
+//   parameters: {
+//     type: 'object',
+//     properties: {
+//       userId: {
+//         type: 'string',
+//         description: 'The unique ID of the user',
+//       },
+//       name: {
+//         type: 'string',
+//         description: 'The name of the user (full sentence)',
+//       },
+//       age: {
+//         type: 'integer',
+//         description: "The user's age (full sentence)",
+//       },
+//       preferences: {
+//         type: 'object',
+//         description: "The user's preferences (favorite things, likes)",
+//         properties: {
+//           favorite_color: {
+//             type: 'string',
+//             description: "The user's favorite color (full sentence)",
+//           },
+//           favorite_food: {
+//             type: 'string',
+//             description: "The user's favorite food (full sentence)",
+//           },
+//           hobbies: {
+//             type: 'array',
+//             items: {
+//               type: 'string',
+//             },
+//             description: "The user's hobbies or interests (full sentence)",
+//           },
+//         },
+//       },
+//       things_to_do: {
+//         type: 'array',
+//         items: {
+//           type: 'string',
+//         },
+//         description:
+//           'Things the user wants to do or plans to do (full sentence)',
+//       },
+//       things_done: {
+//         type: 'array',
+//         items: {
+//           type: 'string',
+//         },
+//         description: 'Things the user has done (full sentence)',
+//       },
+//       things_to_do_later: {
+//         type: 'array',
+//         items: {
+//           type: 'string',
+//         },
+//         description: 'Tasks the user needs to complete later (full sentence)',
+//       },
+//     },
+//     required: ['userId', 'name'],
+//   },
+// };
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    'Saves user profile data, preferences, and other relevant facts in full sentence form to the database.',
+    'Collect detailed information about the user based on the specified categories. Provide results in subject-verb-object sentence form.',
   parameters: {
     type: 'object',
     properties: {
-      userId: {
-        type: 'string',
-        description: 'The unique ID of the user',
-      },
-      name: {
-        type: 'string',
-        description: 'The name of the user (full sentence)',
-      },
-      age: {
-        type: 'integer',
-        description: "The user's age (full sentence)",
-      },
-      preferences: {
+      personal_info: {
         type: 'object',
-        description: "The user's preferences (favorite things, likes)",
         properties: {
-          favorite_color: {
+          age: { type: 'integer', description: "User's age" },
+          gender: { type: 'string', description: "User's gender" },
+          job: { type: 'string', description: "User's occupation" },
+          personality: {
             type: 'string',
-            description: "The user's favorite color (full sentence)",
+            description: "User's personality traits",
           },
-          favorite_food: {
+          living_arrangement: {
             type: 'string',
-            description: "The user's favorite food (full sentence)",
+            description: "User's living arrangement",
           },
-          hobbies: {
+          family_relationship: {
+            type: 'string',
+            description: 'Brief info on family relations',
+          },
+          interpersonal_relationships: {
             type: 'array',
-            items: {
-              type: 'string',
-            },
-            description: "The user's hobbies or interests (full sentence)",
+            items: { type: 'string' },
+            description: 'Key relationships like friends or partners',
           },
         },
       },
-      things_to_do: {
-        type: 'array',
-        items: {
-          type: 'string',
+      likes: {
+        type: 'object',
+        properties: {
+          people: { type: 'array', items: { type: 'string' } },
+          celebrities: { type: 'array', items: { type: 'string' } },
+          colors: { type: 'array', items: { type: 'string' } },
+          places: { type: 'array', items: { type: 'string' } },
+          foods: { type: 'array', items: { type: 'string' } },
+          activities: { type: 'array', items: { type: 'string' } },
+          hobbies: { type: 'array', items: { type: 'string' } },
         },
-        description:
-          'Things the user wants to do or plans to do (full sentence)',
       },
-      things_done: {
-        type: 'array',
-        items: {
-          type: 'string',
+      dislikes: {
+        type: 'object',
+        properties: {
+          foods: { type: 'array', items: { type: 'string' } },
+          people: { type: 'array', items: { type: 'string' } },
+          behaviors: { type: 'array', items: { type: 'string' } },
+          celebrities: { type: 'array', items: { type: 'string' } },
         },
-        description: 'Things the user has done (full sentence)',
       },
-      things_to_do_later: {
-        type: 'array',
-        items: {
-          type: 'string',
+      recent_updates: {
+        type: 'object',
+        properties: {
+          interests: { type: 'array', items: { type: 'string' } },
+          concerns: { type: 'array', items: { type: 'string' } },
+          daily_life: { type: 'string' },
+          relationship_updates: { type: 'string' },
+          future_plans: { type: 'string' },
+          anxieties: { type: 'string' },
+          goals: { type: 'string' },
         },
-        description: 'Tasks the user needs to complete later (full sentence)',
+      },
+      activities: {
+        type: 'object',
+        properties: {
+          past: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Past activities user has done',
+          },
+          current: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Current activities the user is engaged in',
+          },
+          future: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Activities user wants to do in the future',
+          },
+        },
       },
     },
-    required: ['userId', 'name'],
   },
 };
 
