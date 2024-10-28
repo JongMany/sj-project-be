@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { MemoryEntity } from 'src/memory/entities/memory.entity';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserProfileParams } from 'src/constants/function_calling';
 import { UserProfileDetailEntity } from 'src/memory/entities/user-profile-detail.entity';
 import { EditMemoryDto } from 'src/memory/dto/edit-memory.dto';
