@@ -92,9 +92,11 @@ export class GptService {
       if (!message.data.length) {
         break;
       }
+
       messages.push(...message.data);
       afterId = message.data.at(-1)?.id;
     }
+
     return messages;
   }
 
