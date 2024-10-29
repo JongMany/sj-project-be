@@ -55,7 +55,7 @@ export class GptController {
   async getMessages(@Param('threadId') threadId: string, @Response() res) {
     const messages = await this.gptService.getMessages(threadId);
     return res.json({
-      messages: messages.data.reverse(),
+      messages: messages.reverse(),
       success: true,
     });
   }

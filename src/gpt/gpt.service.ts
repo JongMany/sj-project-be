@@ -77,7 +77,26 @@ export class GptService {
   }
 
   async getMessages(threadId: string) {
-    const messages = await this.openAiApi.beta.threads.messages.list(threadId);
+    const messages = [];
+    let afterId = null;
+    while (true) {
+      const message = await this.openAiApi.beta.threads.messages.list(
+        threadId,
+        {
+          limit: 100,
+          after: afterId ?? null,
+          // order: 'desc',
+          // before: beforeId ?? null,
+        },
+      );
+      if (!message.data.length) {
+        break;
+      }
+
+      messages.push(...message.data);
+      afterId = message.data.at(-1)?.id;
+    }
+
     return messages;
   }
 
@@ -243,6 +262,7 @@ export class GptService {
                 return {
                   tool_call_id: toolCall.id,
                   output,
+                  // output: JSON.stringify(args),
                 };
               } else {
                 return {

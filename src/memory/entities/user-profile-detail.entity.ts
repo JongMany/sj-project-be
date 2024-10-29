@@ -19,8 +19,8 @@ export class UserProfileDetailEntity {
   @JoinColumn({ name: 'memoryId' }) // memoryId를 외래 키로 지정
   memory: MemoryEntity;
 
-  @Column()
-  userId: string;
+  // @Column()
+  // userId: string;
 
   @Column()
   type: string; // e.g., 'name', 'age', 'hobby', etc.
