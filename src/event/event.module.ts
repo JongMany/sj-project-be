@@ -13,5 +13,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   controllers: [EventController],
   providers: [EventService],
+  exports: [EventService],
 })
 export class EventModule {}

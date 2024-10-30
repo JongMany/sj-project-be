@@ -23,8 +23,8 @@ abstract class EventLogEntity {
 
 @Entity('memory_event_logs')
 export class MemoryEventLogEntity extends EventLogEntity {
-  @Column()
-  elementId: string;
+  // @Column()
+  // elementId: string;
 
   @Column({ type: 'enum', enum: ['Watch', 'Delete', 'Edit'] })
   eventType: 'Watch' | 'Delete' | 'Edit';
@@ -39,8 +39,8 @@ export class MemoryEventLogEntity extends EventLogEntity {
 
 @Entity('chat_event_logs')
 export class ChatEventLogEntity extends EventLogEntity {
-  @Column()
-  elementId: string;
+  // @Column()
+  // elementId: string;
 
   @Column({ default: 'chat' })
   eventType: string;
