@@ -13,13 +13,17 @@ import { GptService } from './gpt.service';
 import { AssistantType, CreateThreadDto } from 'src/gpt/dto/create-thread.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-access.guard';
 import { CurrentUser } from 'src/auth/decorator/current-user.decorator';
+import { EventService } from 'src/event/event.service';
 
 // https://www.youtube.com/watch?v=rlbKpEGWiT0
 //https://dev.to/esponges/build-the-new-openai-assistant-with-function-calling-52f5
 // // https://pkgpl.org/2023/11/08/openai-assistants-api%EB%A1%9C-%EB%8C%80%ED%99%94-%EB%82%B4%EC%9A%A9-%EC%A0%80%EC%9E%A5%ED%95%98%EA%B8%B0/
 @Controller('gpt')
 export class GptController {
-  constructor(private readonly gptService: GptService) {}
+  constructor(
+    private readonly gptService: GptService,
+    private readonly eventService: EventService,
+  ) {}
 
   @Post('/thread')
   @UseGuards(JwtAuthGuard)
@@ -87,7 +91,12 @@ export class GptController {
   }
 
   @Post('/message')
-  async sendMessage(@Body() body, @Response() res) {
+  @UseGuards(JwtAuthGuard)
+  async sendMessage(
+    @CurrentUser() userId: string,
+    @Body() body,
+    @Response() res,
+  ) {
     const { message: userMessage, threadId, type } = body;
     console.log('', userMessage, threadId, type);
     const message = await this.gptService.addMessage(threadId, userMessage);
@@ -101,6 +110,11 @@ export class GptController {
     const response = await this.gptService.checkingStatus(threadId, runId);
     // TODO: Response -> Database
     if (response !== null) {
+      this.eventService.createChatEventLog({
+        userId,
+        agentType: type,
+        eventType: 'Chat',
+      });
       return res.json({
         messages: response,
       });
