@@ -124,6 +124,7 @@ export class GptController {
         agentType: type,
         eventType: 'Chat',
       });
+
       return res.json({
         messages: response,
       });
