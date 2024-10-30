@@ -16,6 +16,8 @@ export class EventController {
       agentType: type,
       userId,
     });
+    console.log('event', event);
+
     if (event) {
       return {
         success: true,

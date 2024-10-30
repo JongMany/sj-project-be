@@ -6,6 +6,7 @@ import { MemoryEntity } from 'src/memory/entities/memory.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ThreadEntity } from 'src/gpt/entities/thread.entity';
 import { UserProfileDetailEntity } from 'src/memory/entities/user-profile-detail.entity';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UserProfileDetailEntity } from 'src/memory/entities/user-profile-detail
       ThreadEntity,
       UserProfileDetailEntity,
     ]),
+    EventModule,
   ],
   controllers: [MemoryController],
   providers: [MemoryService],
