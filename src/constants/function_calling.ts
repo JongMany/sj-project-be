@@ -82,69 +82,259 @@ export interface UserProfileParams {
 //     required: ['userId', 'name'],
 //   },
 // };
+// export const saveUserProfileTools = {
+//   name: 'saveUserProfile',
+//   description:
+//     'Collect detailed information about the user based on the specified categories. Provide results in subject-verb-object sentence form.',
+//   parameters: {
+//     type: 'object',
+//     properties: {
+//       personal_info: {
+//         type: 'object',
+//         properties: {
+//           age: { type: 'integer', description: "User's age." },
+//           gender: { type: 'string', description: "User's gender" },
+//           job: { type: 'string', description: "User's occupation" },
+//           personality: {
+//             type: 'string',
+//             description: "User's personality traits",
+//           },
+//           living_arrangement: {
+//             type: 'string',
+//             description: "User's living arrangement",
+//           },
+//           family_relationship: {
+//             type: 'string',
+//             description: 'Brief info on family relations',
+//           },
+//           interpersonal_relationships: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Key relationships like friends or partners',
+//           },
+//         },
+//       },
+//       likes: {
+//         type: 'object',
+//         properties: {
+//           people: { type: 'array', items: { type: 'string' } },
+//           celebrities: { type: 'array', items: { type: 'string' } },
+//           colors: { type: 'array', items: { type: 'string' } },
+//           places: { type: 'array', items: { type: 'string' } },
+//           foods: { type: 'array', items: { type: 'string' } },
+//           activities: { type: 'array', items: { type: 'string' } },
+//           hobbies: { type: 'array', items: { type: 'string' } },
+//         },
+//       },
+//       dislikes: {
+//         type: 'object',
+//         properties: {
+//           foods: { type: 'array', items: { type: 'string' } },
+//           people: { type: 'array', items: { type: 'string' } },
+//           behaviors: { type: 'array', items: { type: 'string' } },
+//           celebrities: { type: 'array', items: { type: 'string' } },
+//         },
+//       },
+//       recent_updates: {
+//         type: 'object',
+//         properties: {
+//           interests: { type: 'array', items: { type: 'string' } },
+//           concerns: { type: 'array', items: { type: 'string' } },
+//           daily_life: { type: 'string' },
+//           relationship_updates: { type: 'string' },
+//           future_plans: { type: 'string' },
+//           anxieties: { type: 'string' },
+//           goals: { type: 'string' },
+//         },
+//       },
+//       activities: {
+//         type: 'object',
+//         properties: {
+//           past: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Past activities user has done',
+//           },
+//           current: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Current activities the user is engaged in',
+//           },
+//           future: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Activities user wants to do in the future',
+//           },
+//         },
+//       },
+//     },
+//   },
+// };
+
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    'Collect detailed information about the user based on the specified categories. Provide results in subject-verb-object sentence form.',
+    'If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details as individual sentences in Korean. Ensure this function is called whenever user-specific data across these categories is available, as this function processes and organizes each item into clear, standalone statements to support personalized user experience..',
   parameters: {
     type: 'object',
     properties: {
       personal_info: {
         type: 'object',
         properties: {
-          age: { type: 'integer', description: "User's age" },
-          gender: { type: 'string', description: "User's gender" },
-          job: { type: 'string', description: "User's occupation" },
+          age: {
+            type: 'string',
+            description: "User's age as a sentence",
+            example: '나이는 30세임',
+          },
+          gender: {
+            type: 'string',
+            description: "User's gender as a sentence",
+            example: '성별은 남성임',
+          },
+          job: {
+            type: 'string',
+            description: "User's job as a sentence",
+            example: '직업은 개발자임',
+          },
           personality: {
             type: 'string',
-            description: "User's personality traits",
+            description: "User's personality as a sentence",
+            example: '성격이 활발함',
           },
           living_arrangement: {
             type: 'string',
-            description: "User's living arrangement",
+            description: "User's living arrangement as a sentence",
+            example: ['혼자 살고 있음, 서울에 살고 있음'],
           },
           family_relationship: {
             type: 'string',
-            description: 'Brief info on family relations',
+            description: 'User’s family relationship as a sentence',
+            example: ['가족 중 오빠가 있음', '가족 관계가 좋음'],
           },
           interpersonal_relationships: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Key relationships like friends or partners',
+            description: 'Key relationships, each as an individual sentence',
+            example: ['친구와 자주 만남', '남자친구가 있음'],
           },
         },
       },
       likes: {
         type: 'object',
         properties: {
-          people: { type: 'array', items: { type: 'string' } },
-          celebrities: { type: 'array', items: { type: 'string' } },
-          colors: { type: 'array', items: { type: 'string' } },
-          places: { type: 'array', items: { type: 'string' } },
-          foods: { type: 'array', items: { type: 'string' } },
-          activities: { type: 'array', items: { type: 'string' } },
-          hobbies: { type: 'array', items: { type: 'string' } },
+          people: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Liked people, each as a sentence',
+            example: ['친구와 잘 지냄'],
+          },
+          celebrities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Liked celebrities, each as a sentence',
+            example: ['아이유를 좋아함'],
+          },
+          colors: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Favorite colors, each as a sentence',
+            example: ['파란색을 선호함'],
+          },
+          places: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Favorite places, each as a sentence',
+            example: ['해변을 좋아함'],
+          },
+          foods: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Favorite foods, each as a sentence',
+            example: ['파스타를 좋아함'],
+          },
+          activities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Favorite activities, each as a sentence',
+            example: ['수영을 좋아함'],
+          },
+          hobbies: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Favorite hobbies, each as a sentence',
+            example: ['요리를 취미로 삼음'],
+          },
         },
       },
       dislikes: {
         type: 'object',
         properties: {
-          foods: { type: 'array', items: { type: 'string' } },
-          people: { type: 'array', items: { type: 'string' } },
-          behaviors: { type: 'array', items: { type: 'string' } },
-          celebrities: { type: 'array', items: { type: 'string' } },
+          foods: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Disliked foods, each as a sentence',
+            example: ['매운 음식을 싫어함'],
+          },
+          people: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Disliked people, each as a sentence',
+            example: ['불친절한 사람을 싫어함'],
+          },
+          behaviors: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Disliked behaviors, each as a sentence',
+            example: ['지각하는 것을 싫어함'],
+          },
+          celebrities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Disliked celebrities, each as a sentence',
+            example: ['유명인을 별로 좋아하지 않음'],
+          },
         },
       },
       recent_updates: {
         type: 'object',
         properties: {
-          interests: { type: 'array', items: { type: 'string' } },
-          concerns: { type: 'array', items: { type: 'string' } },
-          daily_life: { type: 'string' },
-          relationship_updates: { type: 'string' },
-          future_plans: { type: 'string' },
-          anxieties: { type: 'string' },
-          goals: { type: 'string' },
+          interests: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Recent interests, each as a sentence',
+            example: ['사진 촬영에 관심이 생김'],
+          },
+          concerns: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Recent concerns, each as a sentence',
+            example: ['건강에 대해 걱정이 있음'],
+          },
+          daily_life: {
+            type: 'string',
+            description: 'Daily life as a sentence',
+            example: '최근에는 바쁜 일상을 보내고 있음',
+          },
+          relationship_updates: {
+            type: 'string',
+            description: 'Relationship updates as a sentence',
+            example: '친구들과 관계가 더욱 가까워짐',
+          },
+          future_plans: {
+            type: 'string',
+            description: 'Future plans as a sentence',
+            example: '해외 여행을 계획 중임',
+          },
+          anxieties: {
+            type: 'string',
+            description: 'Current anxieties as a sentence',
+            example: '직장 문제로 걱정이 있음',
+          },
+          goals: {
+            type: 'string',
+            description: 'Current goals as a sentence',
+            example: '올해 안에 책을 쓰는 것이 목표임',
+          },
         },
       },
       activities: {
@@ -153,199 +343,26 @@ export const saveUserProfileTools = {
           past: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Past activities user has done',
+            description: 'Past activities, each stored as a sentence',
+            example: ['요가를 함', '독서를 즐기곤 함'],
           },
           current: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Current activities the user is engaged in',
+            description: 'Current activities, each stored as a sentence',
+            example: ['헬스를 하고 있음', '프로그래밍을 배우고 있음'],
           },
           future: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Activities user wants to do in the future',
+            description: 'Future planned activities, each stored as a sentence',
+            example: ['등산을 할 계획임', '여행을 갈 예정임'],
           },
         },
       },
     },
   },
 };
-
-// export const saveUserProfileTools = {
-//   name: 'saveUserProfile',
-//   description:
-//     'Saves all relevant user profile data, preferences, and conversation facts to the database',
-//   parameters: {
-//     type: 'object',
-//     properties: {
-//       userId: {
-//         type: 'string',
-//         description: 'The unique ID of the user',
-//       },
-//       name: {
-//         type: 'string',
-//         description: 'The name of the user',
-//       },
-//       age: {
-//         type: 'integer',
-//         description: "The user's age",
-//       },
-//       location: {
-//         type: 'string',
-//         description: "The user's location, city or country",
-//       },
-//       preferences: {
-//         type: 'object',
-//         description: "The user's preferences",
-//         properties: {
-//           favorite_color: {
-//             type: 'string',
-//             description: "The user's favorite color",
-//           },
-//           favorite_food: {
-//             type: 'string',
-//             description: "The user's favorite food",
-//           },
-//           preferred_language: {
-//             type: 'string',
-//             description: "The user's preferred language",
-//           },
-//           hobbies: {
-//             type: 'array',
-//             items: {
-//               type: 'string',
-//             },
-//             description: "The user's hobbies or interests",
-//           },
-//         },
-//       },
-//       recent_activities: {
-//         type: 'array',
-//         items: {
-//           type: 'string',
-//         },
-//         description: 'Recent actions the user has taken or mentioned',
-//       },
-//       device_info: {
-//         type: 'object',
-//         description: "Information about the user's device",
-//         properties: {
-//           device_type: {
-//             type: 'string',
-//             description:
-//               'The type of device the user is using (e.g., mobile, desktop)',
-//           },
-//           os: {
-//             type: 'string',
-//             description: "The operating system of the user's device",
-//           },
-//         },
-//       },
-//       conversation_context: {
-//         type: 'array',
-//         items: {
-//           type: 'string',
-//         },
-//         description: 'Relevant facts gathered during the conversation',
-//       },
-//     },
-//     // required: ['userId', 'name'],
-//   },
-// };
-
-// export const saveUserProfileTools = {
-//   name: 'saveUserProfile',
-//   description:
-//     'Saves user profile data, preferences, and conversation facts into the database. This includes user device information, recent activities, and more.',
-//   parameters: {
-//     type: 'object',
-//     properties: {
-//       userId: {
-//         type: 'string',
-//         description: 'The unique ID of the user. This is a required field.',
-//       },
-//       name: {
-//         type: 'string',
-//         description: 'The name of the user. This is a required field.',
-//       },
-//       age: {
-//         type: 'integer',
-//         description: "The user's age (optional).",
-//         minimum: 0, // Ensure age is a non-negative value
-//       },
-//       location: {
-//         type: 'string',
-//         description:
-//           "The user's location (optional). Could be city, country, etc.",
-//       },
-//       preferences: {
-//         type: 'object',
-//         description: "The user's preferences, such as favorite things.",
-//         properties: {
-//           favorite_color: {
-//             type: 'string',
-//             description: "The user's favorite color.",
-//           },
-//           favorite_food: {
-//             type: 'string',
-//             description: "The user's favorite food.",
-//           },
-//           preferred_language: {
-//             type: 'string',
-//             description: "The user's preferred language for communication.",
-//           },
-//           hobbies: {
-//             type: 'array',
-//             items: {
-//               type: 'string',
-//             },
-//             description: "The user's hobbies or interests (optional).",
-//           },
-//         },
-//       },
-//       recent_activities: {
-//         type: 'array',
-//         items: {
-//           type: 'string',
-//         },
-//         description:
-//           'A list of recent actions or activities the user has taken (optional).',
-//       },
-//       device_info: {
-//         type: 'object',
-//         description: "Information about the user's device (optional).",
-//         properties: {
-//           device_type: {
-//             type: 'string',
-//             description: 'The type of device (e.g., mobile, desktop, tablet).',
-//           },
-//           os: {
-//             type: 'string',
-//             description:
-//               "The operating system running on the user's device (e.g., iOS, Android, Windows).",
-//           },
-//           browser: {
-//             type: 'string',
-//             description: 'The browser used by the user (e.g., Chrome, Safari).',
-//           },
-//           screen_resolution: {
-//             type: 'string',
-//             description: "The user's screen resolution (e.g., 1920x1080).",
-//           },
-//         },
-//       },
-//       conversation_context: {
-//         type: 'array',
-//         items: {
-//           type: 'string',
-//         },
-//         description:
-//           'Relevant facts and contexts gathered from the current conversation.',
-//       },
-//     },
-//     required: ['userId', 'name'], // Making userId and name required
-//   },
-// };
 export function saveUserProfile(params) {
   console.log(params);
   return JSON.stringify(params);
