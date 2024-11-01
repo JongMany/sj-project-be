@@ -328,7 +328,7 @@ export class MemoryService {
   async deleteMemory(memoryId: string) {
     const memory = await this.userProfileDetailRepository.findOne({
       where: { id: memoryId },
-      relations: ['memory'],
+      relations: ['memory', 'memory.thread'],
     });
 
     if (!memory) {
@@ -343,10 +343,13 @@ export class MemoryService {
     const memories = await this.userProfileDetailRepository.find({
       where: { memory: memory.memory },
     });
-    return memories.filter((value) => value.isShow);
+    return {
+      memories: memories.filter((value) => value.isShow),
+      threadType: memory.memory.thread.type,
+    };
   }
 
-  async updateMemory(memoryId: string, editMemoryDto: EditMemoryDto) {
+  async updateMemory(memoryId: string, description: string) {
     const memory = await this.userProfileDetailRepository.findOne({
       where: { id: memoryId },
     });
@@ -355,7 +358,7 @@ export class MemoryService {
       throw new Error('Memory not found');
     }
 
-    memory.description = editMemoryDto.description;
+    memory.description = description;
 
     return await this.userProfileDetailRepository.save(memory);
   }
