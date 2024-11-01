@@ -174,7 +174,10 @@ export class GptService {
   async checkingStatus(
     threadId: string,
     runId: string,
-  ): Promise<OpenAI.Beta.Threads.Messages.MessageContent[][] | null> {
+  ): Promise<{
+    messages: OpenAI.Beta.Threads.Messages.MessageContent[][] | null;
+    isFunctionCalling: boolean;
+  }> {
     let runObject = await this.openAiApi.beta.threads.runs.retrieve(
       threadId,
       runId,
@@ -225,6 +228,7 @@ export class GptService {
     //   console.log(`Run status is '${status}'`);
     //   return null;
     // }
+    let isFunctionCalling = false;
 
     while (status !== 'completed') {
       // await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -272,6 +276,7 @@ export class GptService {
               }
             }),
           );
+          isFunctionCalling = true;
           console.log('Tool outputs:', toolOutputs);
           await this.openAiApi.beta.threads.runs.submitToolOutputs(
             threadId,
@@ -300,7 +305,7 @@ export class GptService {
       messages.push(message.content);
     });
 
-    return messages;
+    return { messages, isFunctionCalling };
   }
 
   async getThreads(email: string) {
