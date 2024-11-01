@@ -126,7 +126,8 @@ export class GptController {
       });
 
       return res.json({
-        messages: response,
+        messages: response.messages,
+        isFunctionCalling: response.isFunctionCalling,
       });
     }
     // }, 100);
