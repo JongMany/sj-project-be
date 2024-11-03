@@ -97,12 +97,12 @@ export class GptController {
     @Body() body,
     @Response() res,
   ) {
-    const { message: userMessage, threadId, type } = body;
+    const { message: userMessage, threadId, type, group } = body;
     console.log('', userMessage, threadId, type);
     const message = await this.gptService.addMessage(threadId, userMessage);
     console.log('sendMessage2', message);
     // run assistant
-    const run = await this.gptService.runAssistant(threadId, type);
+    const run = await this.gptService.runAssistant(threadId, type, group);
     const runId = run.id;
 
     // this.gptService.pollingIntervalId = setInterval(async () => {
@@ -119,8 +119,7 @@ export class GptController {
       return res.json({
         success: true,
         messages: response.messages,
-        // isFunctionCalling: response.isFunctionCalling,
-        isFunctionCalling: true,
+        isFunctionCalling: response.isFunctionCalling,
       });
     }
     // }, 100);
