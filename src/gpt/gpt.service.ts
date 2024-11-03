@@ -100,14 +100,19 @@ export class GptService {
     return messages;
   }
 
-  async runAssistant(threadId: string, type: AssistantType) {
+  async runAssistant(threadId: string, type: AssistantType, userGroup: 'A'|'B'|'C'|'D') {
     console.log('Running assistant for thread' + threadId);
     // TODO: Assistant Additional Instructions을 추가해야함
+    const toolChoiceByUserGroup: 'auto' | 'none' = ['B', 'D'].includes(
+      userGroup,
+    )
+      ? 'auto'
+      : 'none';
     const response = await this.openAiApi.beta.threads.runs.createAndPoll(
       threadId,
       {
         assistant_id: this.ASSISTANT_ID_MAP[type],
-        tool_choice: 'auto', // required는 오래 걸림 / auto는 빠름
+        tool_choice: toolChoiceByUserGroup, // required는 오래 걸림 / auto는 빠름
         tools: [
           {
             type: 'function',
@@ -115,7 +120,7 @@ export class GptService {
           },
         ],
         additional_instructions:
-          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어줘!',
+          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어주고, 무조건, 제일 마지막에 유저가 보낸 메시지를 기반으로만 데이터를 수집해줘',
       },
     );
     console.log('Assistant response2', response);
@@ -258,14 +263,14 @@ export class GptService {
                 // console.log('argsArray', argsArray);
                 console.log('args', args);
 
-                const output = await this.memoryService.createMemory({
+                const {memoryData, isFunctionCalling: isSaved} = await this.memoryService.createMemory({
                   threadId,
                   memoryData: args,
                 });
-
+                isFunctionCalling = isSaved;
                 return {
                   tool_call_id: toolCall.id,
-                  output,
+                  output: memoryData,
                   // output: JSON.stringify(args),
                 };
               } else {
@@ -276,7 +281,7 @@ export class GptService {
               }
             }),
           );
-          isFunctionCalling = true;
+
           console.log('Tool outputs:', toolOutputs);
           await this.openAiApi.beta.threads.runs.submitToolOutputs(
             threadId,

@@ -85,7 +85,7 @@ export interface UserProfileParams {
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    'If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean. Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.',
+    'If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean(-음/함). Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.',
   parameters: {
     type: 'object',
     properties: {
@@ -110,60 +110,134 @@ export const saveUserProfileTools = {
           interpersonal_relationships: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Key relationships like friends or partners',
+            description:
+              "User's key interpersonal relationships, such as friends or partners.",
           },
         },
       },
       likes: {
         type: 'object',
+        description: "User's preferences and favorite things.",
         properties: {
-          people: { type: 'array', items: { type: 'string' } },
-          celebrities: { type: 'array', items: { type: 'string' } },
-          colors: { type: 'array', items: { type: 'string' } },
-          places: { type: 'array', items: { type: 'string' } },
-          foods: { type: 'array', items: { type: 'string' } },
-          activities: { type: 'array', items: { type: 'string' } },
-          hobbies: { type: 'array', items: { type: 'string' } },
+          people: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'People the user likes or admires.',
+          },
+          celebrities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Celebrities the user likes or follows.',
+          },
+          colors: {
+            type: 'array',
+            items: { type: 'string' },
+            description: "User's favorite colors.",
+          },
+          places: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Places the user enjoys visiting or wishes to visit.',
+          },
+          foods: {
+            type: 'array',
+            items: { type: 'string' },
+            description: "User's favorite foods.",
+          },
+          activities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Activities the user enjoys.',
+          },
+          hobbies: {
+            type: 'array',
+            items: { type: 'string' },
+            description: "User's hobbies and interests.",
+          },
         },
       },
       dislikes: {
         type: 'object',
+        description: 'Things the user dislikes or avoids.',
         properties: {
-          foods: { type: 'array', items: { type: 'string' } },
-          people: { type: 'array', items: { type: 'string' } },
-          behaviors: { type: 'array', items: { type: 'string' } },
-          celebrities: { type: 'array', items: { type: 'string' } },
+          foods: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Foods the user dislikes.',
+          },
+          people: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'People the user prefers to avoid.',
+          },
+          behaviors: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Behaviors or actions the user dislikes.',
+          },
+          celebrities: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Celebrities the user dislikes or finds annoying.',
+          },
         },
       },
       recent_updates: {
         type: 'object',
+        description: "User's recent updates and thoughts.",
         properties: {
-          interests: { type: 'array', items: { type: 'string' } },
-          concerns: { type: 'array', items: { type: 'string' } },
-          daily_life: { type: 'string' },
-          relationship_updates: { type: 'string' },
-          future_plans: { type: 'string' },
-          anxieties: { type: 'string' },
-          goals: { type: 'string' },
+          interests: {
+            type: 'array',
+            items: { type: 'string' },
+            description: "User's current interests or new areas of focus.",
+          },
+          concerns: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Current issues or topics of concern for the user.',
+          },
+          daily_life: {
+            type: 'string',
+            description: "User's day-to-day life and routines.",
+          },
+          relationship_updates: {
+            type: 'string',
+            description: "Updates on user's relationships.",
+          },
+          future_plans: {
+            type: 'string',
+            description: "User's plans for the near future.",
+          },
+          anxieties: {
+            type: 'string',
+            description: 'Concerns or anxieties currently affecting the user.',
+          },
+          goals: {
+            type: 'string',
+            description: "User's short- or long-term goals.",
+          },
         },
       },
       activities: {
         type: 'object',
+        description: "User's past, current, and future activities.",
         properties: {
           past: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Past activities user has done',
+            description:
+              'Activities the user has completed or participated in.',
           },
           current: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Current activities the user is engaged in',
+            description: 'Ongoing activities the user is currently engaged in.',
           },
           future: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Activities user wants to do in the future',
+            description:
+              'Activities the user plans or hopes to do in the future.',
           },
         },
       },
