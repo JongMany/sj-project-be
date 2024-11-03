@@ -1,14 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import OpenAI from 'openai';
-import { AssistantType, CreateThreadDto } from './dto/create-thread.dto';
-import { ThreadEntity } from 'src/gpt/entities/thread.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { saveUserProfileTools } from 'src/constants/function_calling';
-import { MemoryService } from 'src/memory/memory.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import OpenAI from "openai";
+import { AssistantType, CreateThreadDto } from "./dto/create-thread.dto";
+import { ThreadEntity } from "src/gpt/entities/thread.entity";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UserEntity } from "src/user/entities/user.entity";
+import { saveUserProfileTools } from "src/constants/function_calling";
+import { MemoryService } from "src/memory/memory.service";
 
 // https://blog.kooky-ai.com/g-18506
 // https://velog.io/@d159123/Nest.js-ChatGPT-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
@@ -30,25 +30,25 @@ export class GptService {
     @InjectRepository(ThreadEntity)
     private readonly threadRepository: Repository<ThreadEntity>,
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>
   ) {
     const configuration = {
       // organization: this.configService.get<string>('CHAT_GPT_ORGANIZATION_ID'),
-      apiKey: this.configService.get<string>('gpt.apiKey'),
+      apiKey: this.configService.get<string>("gpt.apiKey")
     };
     this.openAiApi = new OpenAI(configuration);
     this.ASSISTANT_ID_MAP = {
-      Funny: this.configService.get<string>('gpt.funnyAssistantId'),
-      Feedback: this.configService.get<string>('gpt.feedbackAssistantId'),
-      Kind: this.configService.get<string>('gpt.kindAssistantId'),
-      Default: this.configService.get<string>('gpt.defaultAssistantId'),
+      Funny: this.configService.get<string>("gpt.funnyAssistantId"),
+      Feedback: this.configService.get<string>("gpt.feedbackAssistantId"),
+      Kind: this.configService.get<string>("gpt.kindAssistantId"),
+      Default: this.configService.get<string>("gpt.defaultAssistantId")
     };
   }
 
   async createThread(createThreadDto: CreateThreadDto) {
     const thread = await this.openAiApi.beta.threads.create({});
     const user = await this.userRepository.findOne({
-      where: { email: createThreadDto.email },
+      where: { email: createThreadDto.email }
     });
 
     if (thread.id) {
@@ -56,22 +56,22 @@ export class GptService {
       this.threadRepository.save({
         user,
         threadId: thread.id,
-        type,
+        type
       });
     }
     return thread;
   }
 
   async addMessage(threadId: string, userMessage: string) {
-    console.log('Adding a message to the thread', threadId);
+    console.log("Adding a message to the thread", threadId);
     const response = await this.openAiApi.beta.threads.messages.create(
       threadId,
       {
-        role: 'user',
-        content: userMessage,
-      },
+        role: "user",
+        content: userMessage
+      }
     );
-    console.log('Adding a message Result', response);
+    console.log("Adding a message Result", response);
 
     return response;
   }
@@ -84,10 +84,10 @@ export class GptService {
         threadId,
         {
           limit: 100,
-          after: afterId ?? null,
+          after: afterId ?? null
           // order: 'desc',
           // before: beforeId ?? null,
-        },
+        }
       );
       if (!message.data.length) {
         break;
@@ -100,14 +100,20 @@ export class GptService {
     return messages;
   }
 
-  async runAssistant(threadId: string, type: AssistantType, userGroup: 'A'|'B'|'C'|'D') {
-    console.log('Running assistant for thread' + threadId);
+  async runAssistant(threadId: string, type: AssistantType, userGroup: "A" | "B" | "C" | "D") {
+    console.log("Running assistant for thread" + threadId);
     // TODO: Assistant Additional Instructions을 추가해야함
-    const toolChoiceByUserGroup: 'auto' | 'none' = ['B', 'D'].includes(
-      userGroup,
-    )
-      ? 'auto'
-      : 'none';
+    const isFnCallingTarget = ["B", "D"].includes(
+      userGroup
+    );
+    const toolChoiceByUserGroup: "auto" | "none" = isFnCallingTarget
+      ? "auto"
+      : "none";
+
+    const memories = await this.memoryService.getMemoriesByThreadId(threadId);
+    const additionalInformation = memories.reduce((acc, cur, index) => {
+      return `${acc}\n${index + 1}. ${cur.description}`;
+    }, '');
     const response = await this.openAiApi.beta.threads.runs.createAndPoll(
       threadId,
       {
@@ -115,15 +121,21 @@ export class GptService {
         tool_choice: toolChoiceByUserGroup, // required는 오래 걸림 / auto는 빠름
         tools: [
           {
-            type: 'function',
-            function: saveUserProfileTools,
-          },
+            type: "function",
+            function: saveUserProfileTools
+          }
         ],
         additional_instructions:
-          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어주고, 무조건, 제일 마지막에 유저가 보낸 메시지를 기반으로만 데이터를 수집해줘',
-      },
+          `\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어주고, 무조건, 제일 마지막에 유저가 보낸 메시지를 기반으로만 데이터를 수집해줘.
+          ${
+            isFnCallingTarget &&
+            `${`현재 알고 있는 사용자 정보는 다음과 같아.
+            ${additionalInformation}`}`
+          }
+          `
+      }
     );
-    console.log('Assistant response2', response);
+    console.log("Assistant response2", response);
     return response;
   }
 
@@ -178,18 +190,18 @@ export class GptService {
   // https://platform.openai.com/docs/assistants/tools/function-calling?context=without-streaming
   async checkingStatus(
     threadId: string,
-    runId: string,
+    runId: string
   ): Promise<{
     messages: OpenAI.Beta.Threads.Messages.MessageContent[][] | null;
     isFunctionCalling: boolean;
   }> {
     let runObject = await this.openAiApi.beta.threads.runs.retrieve(
       threadId,
-      runId,
+      runId
     );
 
     let status = runObject.status;
-    console.log('Run status is', status);
+    console.log("Run status is", status);
 
     // if (status === 'completed') {
     //   clearInterval(this.pollingIntervalId);
@@ -235,17 +247,17 @@ export class GptService {
     // }
     let isFunctionCalling = false;
 
-    while (status !== 'completed') {
+    while (status !== "completed") {
       // await new Promise((resolve) => setTimeout(resolve, 1200));
       runObject = await this.openAiApi.beta.threads.runs.retrieve(
         threadId,
-        runId,
+        runId
       );
 
       status = runObject.status;
 
-      console.log('Run status is', status);
-      if (status === 'requires_action') {
+      console.log("Run status is", status);
+      if (status === "requires_action") {
         // this.handleRequiresAction(runObject, threadId);
         try {
           console.log(runObject.required_action.submit_tool_outputs.tool_calls);
@@ -254,48 +266,48 @@ export class GptService {
           const toolOutputs = await Promise.all(
             toolCalls.map(async (toolCall) => {
               const functionName = toolCall.function.name;
-              console.log('functionName', functionName);
+              console.log("functionName", functionName);
 
-              if (functionName === 'saveUserProfile') {
+              if (functionName === "saveUserProfile") {
                 const args = JSON.parse(toolCall.function.arguments);
                 // const argsArray = Object.keys(args).map((key) => args[key]);
 
                 // console.log('argsArray', argsArray);
-                console.log('args', args);
+                console.log("args", args);
 
-                const {memoryData, isFunctionCalling: isSaved} = await this.memoryService.createMemory({
+                const { memoryData, isFunctionCalling: isSaved } = await this.memoryService.createMemory({
                   threadId,
-                  memoryData: args,
+                  memoryData: args
                 });
                 isFunctionCalling = isSaved;
                 return {
                   tool_call_id: toolCall.id,
-                  output: memoryData,
+                  output: memoryData
                   // output: JSON.stringify(args),
                 };
               } else {
                 return {
                   tool_call_id: toolCall.id,
-                  output: null,
+                  output: null
                 };
               }
-            }),
+            })
           );
 
-          console.log('Tool outputs:', toolOutputs);
+          console.log("Tool outputs:", toolOutputs);
           await this.openAiApi.beta.threads.runs.submitToolOutputs(
             threadId,
             runId,
-            { tool_outputs: toolOutputs },
+            { tool_outputs: toolOutputs }
           );
         } catch (error) {
           // required action이 발생했을 때, 에러가 발생하면 run을 취소하고 종료(취소를 하지 않으면 계속해서 active 상태가 되어, 채팅을 못치게 된다)
-          console.log('Error handling required action:', error);
+          console.log("Error handling required action:", error);
           await this.openAiApi.beta.threads.runs.cancel(threadId, runId);
         }
       }
 
-      if (['failed', 'cancelled', 'expired'].includes(status)) {
+      if (["failed", "cancelled", "expired"].includes(status)) {
         console.log(`Run status is '${status}'`);
         break;
       }
@@ -304,7 +316,7 @@ export class GptService {
     const messagesList =
       await this.openAiApi.beta.threads.messages.list(threadId);
     const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
-    console.log('messagesList is shown');
+    console.log("messagesList is shown");
 
     messagesList.data.forEach((message) => {
       messages.push(message.content);
@@ -316,27 +328,27 @@ export class GptService {
   async getThreads(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ['threads'],
+      relations: ["threads"]
     });
     return user.threads.map((thread) => ({
       threadId: thread.threadId,
-      type: thread.type,
+      type: thread.type
     }));
   }
 
   async findThreadIdByType(assistantType: AssistantType, email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ['threads'],
+      relations: ["threads"]
     });
 
     const thread = user.threads.find((thread) => thread.type === assistantType);
-    return thread?.threadId || '';
+    return thread?.threadId || "";
   }
 
   async findThreadById(threadId: string) {
     return this.threadRepository.findOne({
-      where: { threadId },
+      where: { threadId }
     });
   }
 }
