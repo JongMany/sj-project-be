@@ -85,7 +85,8 @@ export interface UserProfileParams {
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    'If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean(-음/함). Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.',
+    `If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean(-음/함). Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.
+    결과는 각 속성마다 문장형태로 반환해줬으면 좋겠어. 예를 들면 \'아이유를 좋아함\', \'일을 했음\' 처럼 음슴체/함체로 변경해서 반환해줘`,
   parameters: {
     type: 'object',
     properties: {
