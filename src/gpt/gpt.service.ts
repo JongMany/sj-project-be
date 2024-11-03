@@ -129,7 +129,7 @@ export class GptService {
           `\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어주고, 무조건, 제일 마지막에 유저가 보낸 메시지를 기반으로만 데이터를 수집해줘.
           ${
             isFnCallingTarget &&
-            `${`현재 알고 있는 사용자 정보는 다음과 같아.
+            `${`현재 알고 있는 대화 상대의 정보는 다음과 같아. 이게 우선 순위가 더 높아야 해
             ${additionalInformation}`}`
           }
           `
