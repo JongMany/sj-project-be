@@ -85,8 +85,7 @@ export interface UserProfileParams {
 export const saveUserProfileTools = {
   name: 'saveUserProfile',
   description:
-    `If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean(-음/함). Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.
-    결과는 각 속성마다 문장형태로 반환해줬으면 좋겠어. 예를 들면 \'아이유를 좋아함\', \'일을 했음\' 처럼 음슴체/함체로 변경해서 반환해줘`,
+    `This function processes and formats user-specific details like personal info, preferences, dislikes, updates, and activities in Korean (-음/함). Call this function whenever user-specific data across these categories is available to generate personalized user experience support. Each attribute should return in sentence form, e.g., '아이유를 좋아함', '일을 했음'.`,
   parameters: {
     type: 'object',
     properties: {
@@ -94,41 +93,41 @@ export const saveUserProfileTools = {
         type: 'object',
         properties: {
           age: { type: 'integer', description: "User's age." },
-          gender: { type: 'string', description: "User's gender" },
-          job: { type: 'string', description: "User's occupation" },
+          gender: { type: 'string', description: "User's gender." },
+          job: { type: 'string', description: "User's occupation." },
           personality: {
             type: 'string',
-            description: "User's personality traits",
+            description: "Traits describing user's personality.",
           },
           living_arrangement: {
             type: 'string',
-            description: "User's living arrangement",
+            description: "User's living situation.",
           },
           family_relationship: {
             type: 'string',
-            description: 'Brief info on family relations',
+            description: 'Summary of user’s family relations.',
           },
           interpersonal_relationships: {
             type: 'array',
             items: { type: 'string' },
             description:
-              "User's key interpersonal relationships, such as friends or partners.",
+              "Key relationships, e.g., friends or partners.",
           },
         },
       },
       likes: {
         type: 'object',
-        description: "User's preferences and favorite things.",
+        description: "User's preferences.",
         properties: {
           people: {
             type: 'array',
             items: { type: 'string' },
-            description: 'People the user likes or admires.',
+            description: 'People the user likes.',
           },
           celebrities: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Celebrities the user likes or follows.',
+            description: 'Celebrities the user follows.',
           },
           colors: {
             type: 'array',
@@ -138,7 +137,7 @@ export const saveUserProfileTools = {
           places: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Places the user enjoys visiting or wishes to visit.',
+            description: 'Places the user enjoys.',
           },
           foods: {
             type: 'array',
@@ -148,18 +147,18 @@ export const saveUserProfileTools = {
           activities: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Activities the user enjoys.',
+            description: 'Preferred activities.',
           },
           hobbies: {
             type: 'array',
             items: { type: 'string' },
-            description: "User's hobbies and interests.",
+            description: "User's hobbies.",
           },
         },
       },
       dislikes: {
         type: 'object',
-        description: 'Things the user dislikes or avoids.',
+        description: 'Disliked things.',
         properties: {
           foods: {
             type: 'array',
@@ -169,82 +168,243 @@ export const saveUserProfileTools = {
           people: {
             type: 'array',
             items: { type: 'string' },
-            description: 'People the user prefers to avoid.',
+            description: 'People the user avoids.',
           },
           behaviors: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Behaviors or actions the user dislikes.',
+            description: 'Disliked behaviors.',
           },
           celebrities: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Celebrities the user dislikes or finds annoying.',
+            description: 'Disliked celebrities.',
           },
         },
       },
       recent_updates: {
         type: 'object',
-        description: "User's recent updates and thoughts.",
+        description: "User's recent updates.",
         properties: {
           interests: {
             type: 'array',
             items: { type: 'string' },
-            description: "User's current interests or new areas of focus.",
+            description: "Current interests.",
           },
           concerns: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Current issues or topics of concern for the user.',
+            description: 'Current concerns.',
           },
           daily_life: {
             type: 'string',
-            description: "User's day-to-day life and routines.",
+            description: "Summary of daily life.",
           },
           relationship_updates: {
             type: 'string',
-            description: "Updates on user's relationships.",
+            description: "Updates on relationships.",
           },
           future_plans: {
             type: 'string',
-            description: "User's plans for the near future.",
+            description: "Near-term plans.",
           },
           anxieties: {
             type: 'string',
-            description: 'Concerns or anxieties currently affecting the user.',
+            description: 'Current anxieties.',
           },
           goals: {
             type: 'string',
-            description: "User's short- or long-term goals.",
+            description: "User's goals.",
           },
         },
       },
       activities: {
         type: 'object',
-        description: "User's past, current, and future activities.",
+        description: "User's activity history.",
         properties: {
           past: {
             type: 'array',
             items: { type: 'string' },
-            description:
-              'Activities the user has completed or participated in.',
+            description: 'Completed activities.',
           },
           current: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Ongoing activities the user is currently engaged in.',
+            description: 'Ongoing activities.',
           },
           future: {
             type: 'array',
             items: { type: 'string' },
-            description:
-              'Activities the user plans or hopes to do in the future.',
+            description: 'Planned activities.',
           },
         },
       },
     },
   },
 };
+// export const saveUserProfileTools = {
+//   name: 'saveUserProfile',
+//   description:
+//     `If information on personal details, likes, dislikes, recent updates, or activities is provided or referenced, this function must be executed to collect and format these details in Korean(-음/함). Ensure this function is called whenever user-specific data across these categories is available, as this function processes to support personalized user experience.
+//     결과는 각 속성마다 문장형태로 반환해줬으면 좋겠어. 예를 들면 \'아이유를 좋아함\', \'일을 했음\' 처럼 음슴체/함체로 변경해서 반환해줘`,
+//   parameters: {
+//     type: 'object',
+//     properties: {
+//       personal_info: {
+//         type: 'object',
+//         properties: {
+//           age: { type: 'integer', description: "User's age." },
+//           gender: { type: 'string', description: "User's gender" },
+//           job: { type: 'string', description: "User's occupation" },
+//           personality: {
+//             type: 'string',
+//             description: "User's personality traits",
+//           },
+//           living_arrangement: {
+//             type: 'string',
+//             description: "User's living arrangement",
+//           },
+//           family_relationship: {
+//             type: 'string',
+//             description: 'Brief info on family relations',
+//           },
+//           interpersonal_relationships: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description:
+//               "User's key interpersonal relationships, such as friends or partners.",
+//           },
+//         },
+//       },
+//       likes: {
+//         type: 'object',
+//         description: "User's preferences and favorite things.",
+//         properties: {
+//           people: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'People the user likes or admires.',
+//           },
+//           celebrities: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Celebrities the user likes or follows.',
+//           },
+//           colors: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: "User's favorite colors.",
+//           },
+//           places: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Places the user enjoys visiting or wishes to visit.',
+//           },
+//           foods: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: "User's favorite foods.",
+//           },
+//           activities: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Activities the user enjoys.',
+//           },
+//           hobbies: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: "User's hobbies and interests.",
+//           },
+//         },
+//       },
+//       dislikes: {
+//         type: 'object',
+//         description: 'Things the user dislikes or avoids.',
+//         properties: {
+//           foods: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Foods the user dislikes.',
+//           },
+//           people: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'People the user prefers to avoid.',
+//           },
+//           behaviors: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Behaviors or actions the user dislikes.',
+//           },
+//           celebrities: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Celebrities the user dislikes or finds annoying.',
+//           },
+//         },
+//       },
+//       recent_updates: {
+//         type: 'object',
+//         description: "User's recent updates and thoughts.",
+//         properties: {
+//           interests: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: "User's current interests or new areas of focus.",
+//           },
+//           concerns: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Current issues or topics of concern for the user.',
+//           },
+//           daily_life: {
+//             type: 'string',
+//             description: "User's day-to-day life and routines.",
+//           },
+//           relationship_updates: {
+//             type: 'string',
+//             description: "Updates on user's relationships.",
+//           },
+//           future_plans: {
+//             type: 'string',
+//             description: "User's plans for the near future.",
+//           },
+//           anxieties: {
+//             type: 'string',
+//             description: 'Concerns or anxieties currently affecting the user.',
+//           },
+//           goals: {
+//             type: 'string',
+//             description: "User's short- or long-term goals.",
+//           },
+//         },
+//       },
+//       activities: {
+//         type: 'object',
+//         description: "User's past, current, and future activities.",
+//         properties: {
+//           past: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description:
+//               'Activities the user has completed or participated in.',
+//           },
+//           current: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description: 'Ongoing activities the user is currently engaged in.',
+//           },
+//           future: {
+//             type: 'array',
+//             items: { type: 'string' },
+//             description:
+//               'Activities the user plans or hopes to do in the future.',
+//           },
+//         },
+//       },
+//     },
+//   },
+// };
 
 // export const saveUserProfileTools = {
 //   name: 'saveUserProfile',
