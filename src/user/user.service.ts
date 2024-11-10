@@ -63,4 +63,13 @@ export class UserService {
     await this.findOne(id);
     await this.userRepository.softDelete(id);
   }
+
+  async getUserPrivacyInfo(id: UserEntity['id']){
+    return await this.userRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['threads'],
+    });
+  }
 }

@@ -60,6 +60,15 @@ export class GptController {
     });
   }
 
+  @Get('/admin/messages/:threadId')
+  async getAdminMessages(@Param('threadId') threadId: string, @Response() res) {
+    const messages = await this.gptService.getMessages(threadId);
+    return res.json({
+      messages: messages.data.reverse(),
+      success: true,
+    });
+  }
+
   @Get('/threads')
   @UseGuards(JwtAuthGuard)
   async getThreads(@CurrentUser() email: string, @Response() res) {

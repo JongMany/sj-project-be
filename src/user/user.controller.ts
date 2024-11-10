@@ -16,6 +16,11 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Get('/privacy/:id')
+  findUsersPrivacyInfo(@Param('id') id: string) {
+    return this.userService.getUserPrivacyInfo(id);
+  }
+
   // @Put(':id')
   // async update(
   //   @Param('id') userId: string,
