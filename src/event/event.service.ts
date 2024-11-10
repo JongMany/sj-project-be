@@ -30,4 +30,23 @@ export class EventService {
     );
     return await this.chatEventLogRepository.save(chatEventLog);
   }
+
+  async getEventLogs(email: string) {
+    const memoryEventLogs = await this.memoryEventLogRepository.find({
+      where: {
+        userId: email,
+      },
+    });
+
+    const chatEventLogs = await this.chatEventLogRepository.find({
+      where: {
+        userId: email,
+      },
+    });
+
+    return {
+      memoryEventLogs: memoryEventLogs ?? [],
+      chatEventLogs: chatEventLogs ?? [],
+    };
+  }
 }
