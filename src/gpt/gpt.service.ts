@@ -96,14 +96,13 @@ export class GptService {
           },
         ],
         additional_instructions:
-          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 사용해서 required_action 상태로 만들어줘!',
+          '\n 유저가 자신의 정보(한 일, 좋아하는 것, 하고 싶은 일)를 주면 반드시 function_calling(tools)을 호출해서 required_action 상태로 만들어줘!',
       },
     );
     console.log('Assistant response2', response);
     return response;
   }
 
-  // https://platform.openai.com/docs/assistants/tools/function-calling?context=without-streaming
   // async handleRequiresAction(
   //   run: OpenAI.Beta.Threads.Runs.Run,
   //   threadId: string,
@@ -152,6 +151,7 @@ export class GptService {
   //   }
   // }
 
+  // https://platform.openai.com/docs/assistants/tools/function-calling?context=without-streaming
   async checkingStatus(
     threadId: string,
     runId: string,
@@ -274,7 +274,6 @@ export class GptService {
     const messagesList =
       await this.openAiApi.beta.threads.messages.list(threadId);
     const messages: OpenAI.Beta.Threads.Messages.MessageContent[][] = [];
-    // console.log('messagesList', messagesList);
     console.log('messagesList is shown');
 
     messagesList.data.forEach((message) => {
