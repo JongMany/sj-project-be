@@ -21,11 +21,18 @@ export class MemoryEntity {
   @JoinColumn({ name: 'threadId' })
   thread: ThreadEntity;
 
+
   // @Column({ type: 'jsonb', nullable: false, default: {} })
   // data: any; // 비정형 데이터를 저장할 필드
+
   // @Column({ type: 'jsonb' })
   // data: any; // 비정형 데이터를 저장할 필드
   @OneToMany(() => UserProfileDetailEntity, (detail) => detail.memory)
   details: UserProfileDetailEntity[];
+<<<<<<< HEAD
+=======
+  // @Column({ type: 'jsonb', nullable: false, default: {} })
+  // data: any; // 비정형 데이터를 저장할 필드
+>>>>>>> 7ca2ecf (feat: admin 용 api 추가)
 
 }
